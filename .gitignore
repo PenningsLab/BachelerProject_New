@@ -1,4 +1,8 @@
-story files
+#Large data files
+PR.txt
+RT.txt
+
+#History files
 .Rhistory
 .Rapp.history
 
