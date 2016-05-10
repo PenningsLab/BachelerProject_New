@@ -1,0 +1,254 @@
+---
+title: "SynSitesRandomization"
+author: "Pleuni"
+date: "November 12, 2015"
+output: html_document
+---
+
+
+```{r}
+
+source('./baseRscript.R')
+```
+
+*Read the stored frequencies rather than calculating frequencies again*
+```{r}
+if (TRUE){#read the stored data
+read.table("../Output/freqPatTsInclDay0-threshold.csv",sep=",",header=TRUE,row.names=1)->freqPatTs
+}
+
+colMeansTs<-apply(freqPatTs, 2 , mean, na.rm=TRUE)
+OverviewDF<-data.frame(num=1:984,colMeansTs, TypeOfSite)
+OverviewDFSyn<-OverviewDF[OverviewDF$TypeOfSite=="syn",]
+
+hist(OverviewDFSyn$colMeansTs,breaks=50)
+var(OverviewDFSyn$colMeansTs)
+
+# KT tryout
+#removing the % highest proportion from the calculations
+#tail(OverviewDFSyn[order(OverviewDFSyn$colMeansTs),],n=-5L)
+perc<-0.10
+dataSelection<-function(type,percent){
+OverviewDFType<-OverviewDF[OverviewDF$TypeOfSite==type,]
+perc<-percent/100
+npatout<-ceiling(nrow(OverviewDFType)*perc)
+OverviewDFTypeOrdered<-OverviewDFType[order(OverviewDFType$colMeansTs),]
+OverviewDFTypeOrderedTail<-OverviewDFTypeOrdered[1:(nrow(OverviewDFTypeOrdered)-npatout),]
+return(OverviewDFTypeOrderedTail)
+}
+
+```
+
+* freqPatTs: data frame of patients (rows) and positions (columns)
+
+* colMeansTs: col means of freqPatTs
+
+* OverviewDF: combination of colmeansts and type of site
+
++ OverviewDFSyn: all syn positions 
+
++ OverviewDFSynTail: all syn positions without the x percent highest frequency values 
+
+
+
+
+
+#OK, now I am going to do the randomization and recalculate the variance 1000 times. Only for the syn sites
+=======
+
+### Synonymous positions
+OK, now I am going to do the randomization and recalculate the variance 1000 times. Only for the syn sites
+```{r}
+
+#original version: no restrictions on outliers
+#freqPatTsSyn<-freqPatTs[,OverviewDF$TypeOfSite=="syn"]
+#consensusBSyn<-consensusB[OverviewDF$TypeOfSite=="syn"]
+
+#adapted to automate type and percent 
+for (w in c(0,2,5,10,15)){
+percent<-w  #KT
+type<-'syn' #KT
+freqPatTsSyn<-freqPatTs[,dataSelection(type,percent)$num] #KT
+consensusBSyn<-consensusB[dataSelection(type,percent)$num] #KT
+
+#
+Asites<-which(consensusBSyn=="a")
+Csites<-which(consensusBSyn=="c")
+Gsites<-which(consensusBSyn=="g")
+Tsites<-which(consensusBSyn=="t")
+
+
+ListOfVars<-c()
+
+for (j in 1:1000){
+  #  if (j%%10 == 0) print(j)
+freqPatTsRandomSyn<-freqPatTsSyn
+
+for (patrow in 1:length(freqPatTs[,1])){
+freqPatTsRandomSyn[patrow,sample(Asites)]<-freqPatTsSyn[patrow,Asites]
+freqPatTsRandomSyn[patrow,sample(Csites)]<-freqPatTsSyn[patrow,Csites]
+freqPatTsRandomSyn[patrow,sample(Gsites)]<-freqPatTsSyn[patrow,Gsites]
+freqPatTsRandomSyn[patrow,sample(Tsites)]<-freqPatTsSyn[patrow,Tsites]
+}
+
+ListOfVars<-c(ListOfVars, var(apply(freqPatTsRandomSyn, 2 , mean, na.rm=TRUE))) #vector with n=runs means 
+assign(paste("ListOfVars",percent,sep="_"),ListOfVars)#KT
+}}
+```
+
+
+
+
+Show the distribution of variances form the randomized data and compare with the value of the ofiginal dataset. It looks very different!
+```{r}
+## settings for version 2
+#hist(ListOfVars,breaks=20,xlim=c(8*10^-6,2*10^-5), main="Histogram of variances vs observed variance")
+## new settings with version 2 adapted with a threshold
+min(ListOfVars);max(ListOfVars)
+
+pdf("../Output/Distribution_of_Variances_top0percentout.pdf",width = 13, height = 10)
+hist(ListOfVars,breaks=20,xlim=c(.9*10^-5,10*10^-5), main="Histogram of variances vs observed variance (0%)")
+abline(v=var(apply(freqPatTsSyn, 2 , mean, na.rm=TRUE)),col=2,lwd=2)
+dev.off()
+```
+
+
+
+Show the distribution of the means for one randome dataset and the original data. One can see that the randomized data have much fewer 0s and fewer high values. 
+```{r}
+colMeansRandomSyn<-apply(freqPatTsRandomSyn, 2 , mean, na.rm=TRUE)
+colMeansSyn<-apply(freqPatTsSyn, 2 , mean, na.rm=TRUE)
+pdf("../Output/Distribution_of_Means_top0percentout.pdf",width = 13, height = 10)
+par(mfrow=c(1,1))
+hist(colMeansSyn,breaks=seq(0,0.2,by=0.001),xlim=c(0,0.04),
+     ylim=c(0,40),
+     col=rgb(1,0,0,0.5),main="Histogram of mean frequencies 0%")
+hist(colMeansRandomSyn,breaks=seq(0,0.1,by=0.001),xlim=c(0,0.04),ylim=c(0,40),add=T,col=rgb(0,0,1,0.5))
+legend("topright", c('Randomized','Observed'), lwd=4, col=c(rgb(0,0,1,0.5), rgb(1,0,0,0.5)))
+dev.off()
+```
+
+
+#Do the same analysis for the non synonymous sites
+```{r}
+#tail version: remove the x% upper highest syn positions (=outliers)
+freqPatTsSyn<-freqPatTs[,OverviewDFSynTail$num]
+consensusBSyn<-consensusB[OverviewDFSynTail$num]
+
+# original version 
+freqPatTsNonSyn<-freqPatTs[,OverviewDF$TypeOfSite=="nonsyn"]
+consensusBNonSyn<-consensusB[OverviewDF$TypeOfSite=="nonsyn"]
+#
+AsitesNonSyn<-which(consensusBNonSyn=="a")
+CsitesNonSyn<-which(consensusBNonSyn=="c")
+GsitesNonSyn<-which(consensusBNonSyn=="g")
+TsitesNonSyn<-which(consensusBNonSyn=="t")
+
+ListOfVarsNonSyn<-c()
+ListOfNumSites0Freq<-c()
+#switch A sites
+
+for (j in 1:100){
+  #  if (j %% 10 == 0 ) print (j)
+freqPatTsRandomNonSyn<-freqPatTsNonSyn
+
+for (patrow in 1:length(freqPatTs[,1])){
+freqPatTsRandomNonSyn[patrow,sample(AsitesNonSyn)]<-freqPatTsNonSyn[patrow,AsitesNonSyn]
+freqPatTsRandomNonSyn[patrow,sample(CsitesNonSyn)]<-freqPatTsNonSyn[patrow,CsitesNonSyn]
+freqPatTsRandomNonSyn[patrow,sample(GsitesNonSyn)]<-freqPatTsNonSyn[patrow,GsitesNonSyn]
+freqPatTsRandomNonSyn[patrow,sample(TsitesNonSyn)]<-freqPatTsNonSyn[patrow,TsitesNonSyn]
+}
+
+ListOfNumSites0Freq<-c(ListOfNumSites0Freq,length(which(apply(freqPatTsRandomNonSyn, 2 , mean, na.rm=TRUE)==0)))
+ListOfVarsNonSyn<-c(ListOfVarsNonSyn, var(apply(freqPatTsRandomNonSyn, 2 , mean, na.rm=TRUE)))
+}
+```
+
+
+Show the distribution of variances form the randomized data and compare with the value of the ofiginal dataset. It looks very different!
+```{r}
+#hist(ListOfVars,breaks=20,xlim=c(8*10^-6,2*10^-5), main="Histogram of variances vs observed variance")
+## new settings with version 2 adapted with a threshold
+min(ListOfVarsNonSyn);max(ListOfVarsNonSyn)
+hist(ListOfVarsNonSyn,breaks=20,xlim=c(1*10^-6,8*10^-5), main="Histogram of variances vs observed variance")
+abline(v=var(apply(freqPatTsNonSyn, 2 , mean, na.rm=TRUE)),col=2,lwd=2)
+
+```
+Show the distribution of the means for one randome dataset and the original data. One can see that the randomized data have much fewer 0s and fewer high values. 
+```{r}
+colMeansRandomNonSyn<-apply(freqPatTsRandomNonSyn, 2 , mean, na.rm=TRUE)
+colMeansNonSyn<-apply(freqPatTsNonSyn, 2 , mean, na.rm=TRUE)
+par(mfrow=c(1,1))
+hist(apply(freqPatTsNonSyn, 2 , mean, na.rm=TRUE),breaks=seq(0,0.2,by=0.001),xlim=c(0,0.04),
+     #ylim=c(0,40),
+     col=rgb(1,0,0,0.5),main="Histogram of randomized (blue) vs observed (red) mean frequencies")
+hist(colMeansRandomNonSyn,breaks=seq(0,0.1,by=0.001),xlim=c(0,0.04),ylim=c(0,40),add=T,col=rgb(0,0,1,0.5))
+legend("topright", c('Randomized','Observed'), lwd=4, col=c(rgb(0,0,1,0.5), rgb(1,0,0,0.5)))
+
+```
+
+
+
+Just to be sure, I want to check that the non-syn sites have lower frequencies than the syn sites and also the stop sites have lower frequencies than the non-syn sites. 
+Not entirely sure what is the best way to do this. 
+
+```{r}
+ks.test(colMeansSyn,colMeansNonSyn,alternative="less")
+
+freqPatTsStop<-freqPatTs[,OverviewDF$TypeOfSite=="stop"]
+colMeansStop<-apply(freqPatTsStop, 2 , mean, na.rm=TRUE)
+
+ks.test(colMeansNonSyn,colMeansStop,alternative="less")
+
+```
+
+Find out how many non syn sites have 0 frequency and how many we'd expect to have 0 freq. 
+
+```{r}
+length(which(colMeansNonSyn==0))
+
+length(which(colMeansRandomNonSyn==0))
+
+hist(ListOfNumSites0Freq,xlim=c(0,30))
+abline(v=length(which(colMeansNonSyn==0)),lwd=2,col=2)
+```
+
+Where are the non-syn sites with 0 frequency? 
+
+OK, let's redo this with the new data!
+
+```{r}
+plot(which(OverviewDF$TypeOfSite=="nonsyn")[which(colMeansNonSyn==0)],rep(1,length(which(colMeansNonSyn==0))),xaxt="n",xlab = "Location",ylab="",ylim=c(0.8,1.2),pch=23)
+points(which(OverviewDF$TypeOfSite=="nonsyn")[which(colMeansNonSyn==0)],rep(1,length(which(colMeansNonSyn==0))),pch="|",cex=1)
+axis(1, at=c(0,150,297,650,1000), labels=c("","PRO","","RT",""),tck=0)
+abline(v=297,col=3,lwd=2)
+abline(v=seq(-1,297,by=30),col=3,lwd=1,lty=2)
+abline(v=seq(296,1000,by=30),col=2,lwd=1,lty=2)
+axis(1, at=seq(-1,297,by=30), labels=seq(0,99,by=10),cex.axis=.5,tck=0,line=-1,lty=0)
+axis(1, at=seq(296,1000,by=30), labels=seq(0,234,by=10),cex.axis=.5,tck=0,line=-1,lty=0)
+```
+
+
+
+=======
+par(mfrow=c(1,1))
+hist(apply(freqPatTsNonSyn, 2 , mean, na.rm=TRUE),breaks=seq(0,0.2,by=0.001),xlim=c(0,0.04),
+     #ylim=c(0,40),
+     col=rgb(1,0,0,0.5),main="Histogram of mean frequencies")
+hist(colMeansRandomNonSyn,breaks=seq(0,0.1,by=0.001),xlim=c(0,0.04),ylim=c(0,40),add=T,col=rgb(0,0,1,0.5))
+legend("topright", c('Randomized','Observed'), lwd=4, col=c(rgb(0,0,1,0.5), rgb(1,0,0,0.5)))
+```
+
+#TRY OUT
+# from the fasta file consensus
+paste(consensusB,collapse="")  
+
+rna<-('.(((((.((.(((((((....)))(((((((((........))).))))))...(((((((..((((((..((((...((((((.((..(((.(((((........(((((((.((((((...(((...))).........((.(((((((((((((((((....)))))))(((((......)))))(((((....)))))..............((((((((.((((((((((...............((((.((((((((((((......))))))..............)))))).)))))))))))))).)))))))).............(((....)))((((((...............))))))..........................(((........)))....(((((......(((...(((((...)))))...))).....)))))......))))))).))).))............((...((((((..........))))))....)).(((..(((.....)))..))).....)))))).)))))))....((....))..(((((...(((((.............(((......(((((((.(((((..(((((((((.((((......(((.....))).......)))).))).))))))..))))).)))))))......)))))).)).)))))..)))))..)))..)).))))))....((((((....((....)).....)))))).................)))))))))))))))))........((((..((((((((((((((......)))))))))...))))).))))(((.((((....)))).)))..............)))))).)))))........((((..((((((......)).)))).))))....................(((......)))')
+a<-strsplit(rna,split="")
+
+AA<-data.frame(num=1:984,colMeansTs, TypeOfSite,a[[1]])
+names(AA)[4]<-'struc'
+AA$struc2<-ifelse(AA$struc=='.','red','blue')
+plot(AA$colMeansTs[order(AA$colMeansTs)]+0.00001,pch='|',log='y',col=AA$struc2[order(AA$colMeansTs)])
+AAsyn<-subset(AA,AA$TypeOfSite=='syn')
+plot(AAsyn$colMeansTs[order(AAsyn$colMeansTs)]+0.00001,pch='|',log='y',col=AAsyn$struc2[order(AA$colMeansTs)])

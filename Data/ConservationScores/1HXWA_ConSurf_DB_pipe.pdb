@@ -1,0 +1,294 @@
+HEADER    HYDROLASE/HYDROLASE INHIBITOR           24-JAN-97   1HXW
+!! ====== IDENTIFICATION SECTION ======
+!js.init
+! consurf_run_number = "ConSurf_DB/1HXW/A";
+!
+! consurf_pdb_id = "1HXW";
+! consurf_chain = "A";
+! consurf_identical_chains = "";
+! consurf_msa_filename = "msa.aln";
+! consurf_msa_query_seq_name = "1PROA";
+! consurf_tree_filename = "";
+!
+!
+! consurf_seqres_length = 99;
+! consurf_atom_seq_length = 99;
+! consurf_unique_seqs = 0;
+! consurf_grade_freqs_isd = Array(0,23,1,2,6,2,8,4,12,41);
+! consurf_grade_freqs = Array(0,23,1,2,6,2,8,4,12,41);
+!
+! seq3d_grades_isd =
+! "9999989991911111771199959999989938111969186964789999648915932111696944114" +
+! "48619899196799811881999998" ;
+!
+! seq3d_grades = 
+! "9999989991911111771199959999989938111969186964789999648915932111696944114" +
+! "48619899196799811881999998" ;
+!
+!
+!! ====== CONTROL PANEL OPTIONS SECTION ======
+!js.init
+! pipe_title = "<i>ConSurf-DB View:</i> 1HXW chain A."
+!! pipe_subtitle is from TITLE else COMPND
+!!
+! pipe_subtitle =
+! " HIV-1 PROTEASE DIMER COMPLEXED WITH A-84538 ";
+! pipe_title_enlarged = false;
+! pipe_background_color = "white";
+!
+!! Specify the custom consurf control panel
+!!
+! pipe_cp1 = "consurf/consurf.htm";
+!
+!! If you want the frontispiece to be reset every time you enter this
+!! page, use false. If this is a one-page presentation (no contents)
+!! and you want to be able to return from QuickViews without resetting
+!! the view, use true.
+!!
+! frontispiece_conditional_on_return = true;
+!
+!! Open the command input slot/message box to 30% of window height.
+!!
+! pipe_show_commands = true;
+! pipe_show_commands_pct = 30;
+!
+!! Don't show the PiPE presentation controls in the lower left frame.
+!!
+! pipe_hide_controls = true;
+!
+!! Hide development viewing mode links at the bottom of the control panel.
+!!
+! pipe_tech_info = false; 
+!
+!! pipe_start_spinning = true; // default is PE's Preference setting.
+!! top.nonStopSpin = true; // default: spinning stops after 3 min.
+!!
+!! ====== COLORS SECTION ======
+!!
+!color color_carbon C8C8C8
+!color color_sulfur FFC832
+!
+!! Ten ConSurf color grades follow:
+!!
+!color color_grade0 FFFF96 insufficient data yellow
+!color color_grade1 10C8D1 turquoise variable
+!color color_grade2 8CFFFF
+!color color_grade3 D7FFFF
+!color color_grade4 EAFFFF
+!color color_grade5 FFFFFF
+!color color_grade6 FCEDF4
+!color color_grade7 FAC9DE
+!color color_grade8 F07DAB
+!color color_grade9 A02560 burgundy conserved
+!
+!
+!! ====== SCRIPTS SECTION ======
+!!----------------------------------------
+!!
+!spt #name=select_and_chain
+! select selected and :A
+!
+!!----------------------------------------
+!!
+!spt #name=view01
+! @spt consurf_view_isd
+!
+!!----------------------------------------
+!!
+!spt #name=hide_all
+! restrict none
+! ssbonds off
+! hbonds off
+! dots off
+! list * delete
+!
+!!----------------------------------------
+!! common_spt uses CPK carbon gray (or phosphorus yellow) for backbones.
+!!
+!spt #name=common_spt
+! @spt hide_all
+! select all
+! color [xC8C8C8] # rasmol/chime carbon gray
+! select nucleic
+! color [xFFA500] # phosphorus orange
+! select hetero
+! color cpk
+! select not hetero
+! backbone 0.4
+! javascript top.water=0
+! 
+! ssbonds 0.3
+! set ssbonds backbone
+! color ssbonds @color_sulfur
+! 
+! select hetero and not water
+! spacefill 0.45
+! wireframe 0.15
+! dots 50
+! 
+! select protein
+! center selected
+! 
+!!----------------------------------------
+!!
+!spt #name=consurf_view_isd
+! @spt common_spt
+! @for $=0, 9
+! @spt select_isd_grade$
+! @spt select_and_chain
+! color @color_grade$
+! spacefill
+! @endfor
+! zoom 115
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade9
+!
+! select PRO1, GLN2, ILE3, THR4, LEU5, GLN7, ARG8, PRO9, VAL11, GLU21, ALA22
+! select selected or LEU23, ASP25, THR26, GLY27, ALA28, ASP29, THR31, VAL32
+! select selected or LEU38, GLY40, PRO44, GLY49, ILE50, GLY51, GLY52, VAL56
+! select selected or TYR59, ILE66, GLY68, GLY78, THR80, PRO81, ASN83, GLY86
+! select selected or ARG87, GLY94, CYS95, THR96, LEU97, ASN98
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade8
+!
+! select TRP6, ASP30, GLU34, TRP42, GLY48, LYS55, VAL75, PRO79, ASN88, THR91
+! select selected or GLN92, PHE99
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade7
+!
+! select GLY17, GLN18, ILE47, ILE85
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade6
+!
+! select PRO39, LYS43, LYS45, PHE53, GLU65, CYS67, LEU76, ILE84
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade5
+!
+! select LEU24, GLN58
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade4
+!
+! select MET46, ILE54, HIS69, LYS70, GLY73, THR74
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade3
+!
+! select LEU33, ASP60
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade2
+!
+! select GLN61
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade1
+!
+! select LEU10, THR12, ILE13, LYS14, ILE15, GLY16, LEU19, LYS20, GLU35, MET36
+! select selected or ASN37, ARG41, ARG57, ILE62, LEU63, ILE64, ALA71, ILE72
+! select selected or VAL77, VAL82, LEU89, LEU90, ILE93
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_isd_grade0
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade9
+!
+! select PRO1, GLN2, ILE3, THR4, LEU5, GLN7, ARG8, PRO9, VAL11, GLU21, ALA22
+! select selected or LEU23, ASP25, THR26, GLY27, ALA28, ASP29, THR31, VAL32
+! select selected or LEU38, GLY40, PRO44, GLY49, ILE50, GLY51, GLY52, VAL56
+! select selected or TYR59, ILE66, GLY68, GLY78, THR80, PRO81, ASN83, GLY86
+! select selected or ARG87, GLY94, CYS95, THR96, LEU97, ASN98
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade8
+!
+! select TRP6, ASP30, GLU34, TRP42, GLY48, LYS55, VAL75, PRO79, ASN88, THR91
+! select selected or GLN92, PHE99
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade7
+!
+! select GLY17, GLN18, ILE47, ILE85
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade6
+!
+! select PRO39, LYS43, LYS45, PHE53, GLU65, CYS67, LEU76, ILE84
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade5
+!
+! select LEU24, GLN58
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade4
+!
+! select MET46, ILE54, HIS69, LYS70, GLY73, THR74
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade3
+!
+! select LEU33, ASP60
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade2
+!
+! select GLN61
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade1
+!
+! select LEU10, THR12, ILE13, LYS14, ILE15, GLY16, LEU19, LYS20, GLU35, MET36
+! select selected or ASN37, ARG41, ARG57, ILE62, LEU63, ILE64, ALA71, ILE72
+! select selected or VAL77, VAL82, LEU89, LEU90, ILE93
+!
+!
+!!----------------------------------------
+!!
+!spt #name=select_grade0
+! select none
+!!
+!! ====== END OF CONSURF PiPE BLOCK ======

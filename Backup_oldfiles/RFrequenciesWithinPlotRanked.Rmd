@@ -1,0 +1,216 @@
+
+#Making ranked plot
+
+load relevant libraries and read consensusfasta file
+
+```{r}
+if (TRUE){
+    setwd("~/Dropbox/MarionKristofBachelerProject/CodePleuni/")
+	library(ape)
+	library(seqinr)
+    #install.packages("pegas")
+    library(pegas)
+	#read the file with the resistance mutations
+	source("RResistanceMutations.r")
+	#read the fasta file 
+	consensusfasta<-read.dna("HIV1_CON_2004_POL_DNA.fasta", format = "fasta",as.character=TRUE)	
+	#where is the start of POL? 
+	polstart=regexpr("cctca",paste(consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"),],collapse=""))[1]
+	consensusB<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"), polstart:(polstart+983)]
+	consofcons<-consensusfasta[which(row.names(consensusfasta)=="CON_OF_CONS"), polstart:(polstart+983)]
+}
+```
+
+#Read the stored frequencies in stead
+```{r}
+if (TRUE){#read the stored data
+read.table("../freqPatSiteInclDay0.csv",sep=",",header=TRUE,row.names=1)->freqPatSite
+read.table("../freqPatTsInclDay0.csv",sep=",",header=TRUE,row.names=1)->freqPatTs
+}
+```
+```{r}
+transition<-function(nuc){
+    if (nuc=="a") return("g")
+    if (nuc=="g") return("a")
+    if (nuc=="c") return("t")
+    if (nuc=="t") return("c")
+}
+```
+#for each mutation, determine whether it is synonymous, non-synonymous or creates a stop
+
+```{r}
+typeofsitefunction<-function(WTcodon, mutantcodon){
+    WTAA<-translate(WTcodon)
+    MUTAA<-translate(mutantcodon)
+    if (WTAA == MUTAA) return ("syn")
+    else if (MUTAA == "*") return ("stop")
+    else return ("nonsyn")
+}
+```    
+
+```{r}
+TypeOfSite<-c()
+for (codon in 1:(984/3)){#for each codon in the sequence
+    positions <- c(codon*3-2,codon*3-1, codon*3)
+    WTcodon <- consensusB[positions]
+    mutant1codon <- c(transition(WTcodon[1]), WTcodon[2:3])
+    mutant2codon <- c(WTcodon[1],transition(WTcodon[2]), WTcodon[3])
+    mutant3codon <- c(WTcodon[1:2], transition(WTcodon[3]))
+    TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant1codon))
+    TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant2codon))
+    TypeOfSite<-c(TypeOfSite,typeofsitefunction(WTcodon,mutant3codon))
+}
+```    
+
+```{r}
+#make sure that resistance sites in RT have a diff type of site
+TypeOfSite[sort(c((RTImuts$pos*3)-2,(RTImuts$pos*3)-1,(RTImuts$pos*3)))+297]<-"res"
+```
+
+```{r}
+#Calculate mean freq for each site 
+attach(freqPatSite); colMeans<-apply(freqPatSite, 2 , mean, na.rm=TRUE)
+attach(freqPatTs); colMeansTs<-apply(freqPatTs, 2 , mean, na.rm=TRUE)
+
+#Get conf intervals by bootsstrapping
+btmeansTs<-data.frame(row.names=names(freqPatTs)[1:984]) #each row is a site, each column is a bootstrapped mean
+numbootstraps=100 # small number to make it faster
+for (j in 1:984){# start with the first site
+for (k in 1:numbootstraps){ # first iteration
+  btmeansTs[j,k]=mean(sample(freqPatTs[,j],length(freqPatTs[,j]),replace = TRUE),na.rm=TRUE)
+}}
+btmeansSorted<-t(apply(btmeansTs,1,sort))
+lowerConf<-btmeansSorted[,floor(0.025*numbootstraps)]
+upperConf<-btmeansSorted[,floor((1-0.025)*numbootstraps)]
+
+x<-data.frame(num=1:984,colMeansTs,TypeOfSite,lowerConf,upperConf)
+newdata <- x[order(colMeansTs),] 
+newdata$color<-""
+for (i in 1:984){
+    if (newdata$TypeOfSite[i]=="syn") newdata$color[i] = "green"
+    if (newdata$TypeOfSite[i]=="nonsyn") newdata$color[i] = "red"
+    if (newdata$TypeOfSite[i]=="stop") newdata$color[i] = "black"
+    if (newdata$TypeOfSite[i]=="res") newdata$color[i] = "purple"
+}
+```
+
+```{r}
+#pdf("Protease.pdf",width = 13, height = 10)
+PROdata<-newdata[newdata$num<298,]
+#remove resistance mutations
+PROdata<-PROdata[PROdata$TypeOfSite!="res",]
+plot(PROdata$colMeansT+0.001,log="y",ylim=c(0.001,0.15),cex=2, pch = "|",col=PROdata$color)
+#arrows(1:length(PROdata$num), PROdata$lowerConf +0.001, 1:length(PROdata$num), PROdata$upperConf +0.001, 
+#       angle=90, length=0.01, code=3, col=PROdata$color,lwd=0.1)
+#dev.off()
+```
+
+```{r}
+#pdf("RT.pdf",width = 13, height = 10)
+RTdata<-newdata[newdata$num>=298,]
+RTdata<-RTdata[RTdata$TypeOfSite!="res",]
+plot(RTdata$colMeansT+0.001,log="y",ylim=c(0.001,0.15),cex=1, pch = "|",col=RTdata$color)
+#arrows(1:length(RTdata$num), RTdata$lowerConf +0.001, 1:length(RTdata$num), RTdata$upperConf +0.001, 
+#       angle=90, length=0.01, code=3, col=RTdata$color,lwd=0.1)
+#dev.off()
+
+#For protease, which are the not-lethal stop codons? 
+```{r}
+#head(PROdata)
+PROdata[PROdata$TypeOfSite=="stop"& PROdata$colMeansTs>0,]
+#site 4 and site 125
+#Which codons are they part of?
+plot(PROdata$colMeansT+0.001,log="y",ylim=c(0.001,0.2),cex=2, pch = "|",col=PROdata$color)
+
+sites<-PROdata$num[PROdata$TypeOfSite=="stop"& PROdata$colMeansTs>0]
+codons<-ceiling(sites/3)
+
+for (codon in codons){
+    positions <- c(codon*3-2,codon*3-1, codon*3)
+    rows<-which(PROdata$num %in% sites)
+    points(rows,PROdata$colMeansT[rows]+0.001,col=PROdata$color[rows],cex=2,pch=16)
+#    print(positions)
+#    WTcodon <- consensusB[positions]
+#    print (WTcodon)
+#    print(translate(WTcodon))
+#    print(PROdataz#print frequencies
+}
+
+#points(PROdata$colMeansT+0.001)
+
+```
+
+```{r}
+#for ease of reading 
+freqPatTs<-round(freqPatTs,2)
+```
+
+#I need to look at the original fasta files and look at the frequency of codons. 
+```{r}
+list.files(path="../FASTAfiles/")->listfastafiles
+for (co in codons){#for each site in the sequence
+    ListAA<-c(); ListCodon<-c()
+    for (i in 1:length(listfastafiles)){ #for each fastafile 
+        filename=paste("/Users/pleuni/Dropbox/DevanShahProject/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
+	    #print(filename)
+	    patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file 
+		if (length(patfasta[,1])>1) {
+        WTcodon =	consensusB[c(co*3-2,co*3-1,co*3)]; #what is WT at site j?
+        WTAA = translate(WTcodon)
+        Patcodon = patfasta[,c(co*3-2,co*3-1,co*3)]
+        #print(Patcodon)
+        PatAA = apply(Patcodon, 1, function(x) translate(x))
+        ListAA<-c(ListAA, PatAA)
+        Patcodon<-apply(Patcodon, 1, function(x) paste(x,collapse=""))
+        ListCodon<-c(ListCodon,Patcodon)
+        }
+    }
+    print(paste("Codon: ", co))
+    print(table(ListAA))
+    print(table(ListCodon))
+}
+
+```
+# how do they get these high frequencies. Is it due to a few patients? 
+#So for the first stop codon, the stop codon actually occurs, but in very small numbers (count: 3)
+#For the second stop codon, the polymorphism that would create a stop codon is always paired with a neighboring mutation that makes it a non-syn mutation. 
+
+```{r}
+PROdataNonSyn<-PROdata[PROdata$TypeOfSite=="nonsyn",]
+#Make plot of Protease 
+plot(PROdataNonSyn$num[order(PROdataNonSyn$num)],PROdataNonSyn$colMeansTs[order(PROdataNonSyn$num)]+0.001,col=PROdataNonSyn$color[order(PROdataNonSyn$num)],pch=16,log="y",type="b")
+#Add moving mean
+for (i in 20:280){
+    range = (i-20):(i+20)
+#    points(i, mean(PROdataNonSyn$colMeansTs[PROdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(PROdataNonSyn$colMeansTs[PROdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
+}
+
+
+RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
+plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
+
+#Add moving mean
+for (i in 370:900){
+    range = (i-20):(i+20)
+    points(i, mean(RTdataNonSyn$colMeansTs[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(RTdataNonSyn$colMeansTs[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
+}
+
+i=370
+    range = (i-20):(i+20)
+
+
+```
+
+
+
+
+#For protease, which are the most deleterious non-syn sites? 
+
+
+#For protease, which are the most deleterious syn sites? 
+
+
+
+

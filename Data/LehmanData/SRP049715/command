@@ -1,0 +1,14 @@
+for t in SRR*; do cd $t; sudo /Users/hopla/Downloads/sratoolkit.2.5.4-mac64\ 2/bin/fastq-dump.2.5.4 $t.sra; cd ..  ;done
+
+
+
+for k in SRR*; do cd $k; sudo grep -A1 '^@' $k.fastq | sudo sed 's/@/>/g' | sudo sed 's/ .*//g' >> $k.fasta; cd ..;done
+
+
+grep -A1 '^@' boe.fastc > boe.fasta
+
+
+
+
+for t in SRR*; sudo /Users/hopla/Downloads/sratoolkit.2.5.4-mac64\ 2/bin/fastq-dump.2.5.4 --fasta $t  ;done
+

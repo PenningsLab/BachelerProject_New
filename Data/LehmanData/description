@@ -1,0 +1,15 @@
+
+Ey,
+
+I finally found one way to download the data from the PrepStudy.
+You have to go to this site: http://www.ncbi.nlm.nih.gov/home/download.shtml
+and click on the FTP download button, then you log on as guest and you have to click through several folders
+sra/sra-instant/reads/ByStudy/sra/SRP/SRP049/SRP049715
+
+I just copied the files to my computer. Didn't take to long.
+
+I want to try to figure out how to use the Aspera tool as well, but at least this is one way to do it.
+
+Have a nice evening!
+
+Marion

@@ -1,0 +1,190 @@
+#remove resistance mutations
+#plot seperately for fourfold sites?
+  
+
+#plot freq distributions for 1st and 2nd pos sites 
+#I ignore the first 24 sites, because i think they may be biased bc of the primer site 
+if (TRUE){
+pdf("freqdis_WITHINallpatients_12.pdf")
+par(mfrow=c(3,4))
+brks = seq(0,1,by=1/69)
+for (k in firstandsecondpos){
+	hist(freqPatSite[,k],breaks=brks,xlim=c(0,1),col=2,border=2,ylim=c(0,5.5),freq=FALSE,main=paste("site",k))
+	text(0.6,4,paste("n=",length(which(!is.na(freqPatSite[,k])))))
+	text(0.6,3,paste("prob_seg=",round(length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)),2)))
+	text(0.6,5,paste("mean freq=",round(mean(freqPatSite[,k],na.rm=TRUE),3)),cex=0.8)
+}
+dev.off()
+
+pdf("freqdis_WITHINallpatients_3_ffdeg.pdf")
+par(mfrow=c(3,4))
+brks = seq(0,1,by=1/69)
+for (k in fourfoldsites){
+	hist(freqPatSite[,k],breaks=brks,xlim=c(0,1),col=1,border=1,ylim=c(0,5.5),freq=FALSE,main=paste("site",k))
+	text(0.6,4,paste("n=",length(which(!is.na(freqPatSite[,k])))))
+	text(0.6,3,paste("prob_seg=",round(length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)),2)))
+	text(0.6,5,paste("mean freq=",round(mean(freqPatSite[,k],na.rm=TRUE),3)),cex=0.8)
+}
+dev.off()
+
+pdf("freqdis_WITHINallpatients_3_NOTffdeg.pdf")
+par(mfrow=c(3,4))
+brks = seq(0,1,by=1/69)
+for (k in otherthirdpossites){
+	hist(freqPatSite[,k],breaks=brks,xlim=c(0,1),col=3,border=3,ylim=c(0,5.5),freq=FALSE,main=paste("site",k))
+	text(0.6,4,paste("n=",length(which(!is.na(freqPatSite[,k])))))
+	text(0.6,3,paste("prob_seg=",round(length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)),2)))
+	text(0.6,5,paste("mean freq=",round(mean(freqPatSite[,k],na.rm=TRUE),3)),cex=0.8)
+}
+dev.off()
+}
+
+
+
+#Get the distribution of the number of patients where a site is polymorphic, given that the patient had only the B consensus base at day 0
+#Make sure to not include resistance mutations
+if (TRUE){
+
+sprob_seg_otherthirdpossites<-c()
+for (k in otherthirdpossites){
+	if (length(grep(k,AllNtPositionsInvolvedInResistance))<1){ 
+		prob_seg_otherthirdpossites<-c(prob_seg_otherthirdpossites,length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)))}}
+
+prob_seg_ffdeg_thirdpossites<-c()
+for (k in fourfoldsites){
+	if (length(grep(k,AllNtPositionsInvolvedInResistance))<1){ 
+		prob_seg_ffdeg_thirdpossites<-c(prob_seg_ffdeg_thirdpossites,length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)))}}
+
+prob_seg_firstandsecondpos<-c()
+for (k in firstandsecondpos){
+	if (length(grep(k,AllNtPositionsInvolvedInResistance))<1){ 
+		prob_seg_firstandsecondpos<-c(prob_seg_firstandsecondpos,length(which(freqPatSite[,k]>0))/length(which(freqPatSite[,k]>-.1)))}}
+
+pdf("Distribution_Prob_Seg.pdf")
+par(mfrow=c(3,1)); brks = seq(0,1,by=1/40)
+hist(prob_seg_firstandsecondpos,col=2,freq=FALSE,breaks=brks,xlim=c(0,.4),ylim=c(0,20))
+hist(prob_seg_ffdeg_thirdpossites,col=1,freq=FALSE,breaks=brks,xlim=c(0,.4),ylim=c(0,20))
+hist(prob_seg_otherthirdpossites,col=3,freq=FALSE,breaks=brks,xlim=c(0,.4),ylim=c(0,20))
+dev.off()
+}
+
+
+
+
+
+
+
+
+# Play stuff Kristof 
+TypeOfSite2<-TypeOfSite
+
+TypeOfSite2[TypeOfSite2=='4'] <-c('blue')
+TypeOfSite2[TypeOfSite2=='2'] <-c('red')
+TypeOfSite2[TypeOfSite2=='3'] <-c('red')
+TypeOfSite2[TypeOfSite2=='5'] <-c('green')
+
+
+dd<-cbind(colMeansTs[298:984],TypeOfSite2[298:984])
+dddd<-ddd[order(ddd[,1]),]
+
+plot(rep(0.5,687),col=dddd[,2],type='h',ylim=c(0,0.5))
+lines(dddd[,1],type='l',col='yellow')
+
+
+
+ff<-cbind(colMeans[298:984],colorvector)
+ffff<-ff[order(ff[,1]),]
+plot(rep(0.5,687),col=ffff[,2],type='h',ylim=c(0,0.5))
+lines(ffff[,1],type='l',col='yellow')
+
+
+
+
+gg<-cbind(colMeansTv[298:984],colorvectortv)
+gggg<-gg[order(as.numeric(gg[,1])),]
+plot(rep(0.5,687),col=gggg[,2],type='h',ylim=c(0,0.5))
+lines(as.numeric(gggg[,1]),type='l',col='yellow')
+
+
+
+
+dfg<-cbind(dd,gg,ff)
+dfgorder<-dfg[order(dfg[,5]),]
+
+dfgorder[,c(2,4)]
+
+
+
+# ordered, bar, en yellow line frequence  FINAL
+pdf('frequency-synnonsym.pdf')
+par(mfrow = c(3,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(rep(0.5,687),col=dfgorder[,2],type='h',ylim=c(0,0.5))
+lines(as.numeric(dfgorder[,1]),type='l',col='yellow')
+plot(rep(0.5,687),col=dfgorder[,4],type='h',ylim=c(0,0.5))
+lines(as.numeric(dfgorder[,3]),type='l',col='yellow')
+plot(rep(0.5,687),col=dfgorder[,6],type='h',ylim=c(0,0.5))
+lines(as.numeric(dfgorder[,5]),type='l',col='yellow')
+dev.off()
+
+
+pdf('frequency-synnonsym2.pdf')
+par(mfrow = c(3,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(log(as.numeric(dfgorder[,1])*100),col=dfgorder[,2])
+plot(log(as.numeric(dfgorder[,3])*100),col=dfgorder[,4])
+plot(log(as.numeric(dfgorder[,5])*100),col=dfgorder[,6])
+dev.off()
+
+
+
+## orderred correctly
+par(mfrow = c(3,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(rep(0.5,687),col=dddd[,2],type='h',ylim=c(0,0.5))
+lines(dddd[,1],type='l',col='yellow')
+plot(rep(0.5,687),col=gggg[,2],type='h',ylim=c(0,0.5))
+lines(as.numeric(gggg[,1]),type='l',col='yellow')
+plot(rep(0.5,687),col=ffff[,2],type='h',ylim=c(0,0.5))
+lines(ffff[,1],type='l',col='yellow')
+
+
+
+## other
+par(mfrow = c(2,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(rep(0.5,687),col=ddd[,2],type='h',ylim=c(0,0.5))
+lines(dd[,1],type='l',col='yellow')
+plot(rep(0.5,687),col=ff[,2],type='h',ylim=c(0,0.5))
+lines(ff[,1],type='l',col='yellow')
+
+
+
+
+par(mfrow = c(2,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(rep(0.5,687),col=ddd[,2],type='h',ylim=c(0,0.5))
+plot(rep(0.5,687),col=ff[,2],type='h',ylim=c(0,0.5),xaxt='n')
+axis(1,1:229,at=seq(1,687,by=3),cex=0.4)
+axis(1,rep("R",22),at=(sort(RTImuts[,1])*3)+1.,cex=0.4)
+
+
+
+
+
+# according to position With frequence
+par(mfrow = c(2,1),
+oma = c(5,4,0,0) + 0.1,
+mar = c(0,0,1,1) + 0.1)
+plot(ddd[,1],col=ddd[,2],type='h',ylim=c(0,0.5))
+plot(ff[,1],col=ff[,2],type='h',ylim=c(0,0.5),xaxt='n')
+axis(1,rep("R",22),at=(sort(RTImuts[,1])*3)+1.,cex=0.4)
+
+axis(1,1:229,at=seq(1,687,by=3),cex=0.4)
+
+

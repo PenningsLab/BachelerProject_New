@@ -1,0 +1,42 @@
+#Listing of the different conceptual steps to take. 
+
+# rationale
+detect synyonm at low or high frequence
+detect nonsym at high frequency
+
+
+# to keep in mind 
+-  Graur et al: any change at position 1 and 2 of the codon is always (95% and 100%) nonsynonymous. 
+-> so it must be always red red blue/red
+
+# datasets
+1. Bacheler dataset -> see script of the analysis
+2. Prep dataset: to check for similar patterns 
+
+
+
+
+
+
+#Ideas
+
+1. for each site,  calculate substitution frequencies and impact on AA (syn,nonsyn,stop)
+  - rank according to frequency
+  - double check stop codons (double mutant problem -> check also impact on AA and frequencies
+  - positional ranking-> detect regions with low substitutions
+  
+
+
+Protease: minimal conserved AA across subtypes (Svicher): what about the rest?
+AA sequences: distance distribution in absolute numbers (use popart)
+
+P(ts) > P(tv): ok
+P(nonsyn|tv) > P(nonsyn|ts) but how much (control for tv 2nt en ts 1nt
+
+If you have a substitution matrix: actg (actg)-1 , then you already have some biases 
+To what extent does a position deviate from the matrix (which is the 'average')? 
+
+#Relevant literature.
+Zanini & Neher 2013, 2015
+
+

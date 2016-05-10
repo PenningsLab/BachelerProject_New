@@ -1,0 +1,90 @@
+---
+title: "LosAlamosData"
+author: "Pleuni"
+date: "November 4, 2015"
+output: html_document
+---
+
+```{r}
+    library(ape)
+	library(seqinr)
+	library(pegas)
+	#read the file with the resistance mutations
+	source("./RResistanceMutations.r")
+	#read the fasta file 
+	consensusfasta<-read.dna("../Data/HIV1_CON_2004_POL_DNA.fasta", format = "fasta",as.character=TRUE)	
+	#where is the start of POL? 
+
+	polstart=regexpr("cctca",paste(consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"),],collapse=""))[1]
+
+consensusB<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"), polstart:(polstart+983)]
+	consofcons<-consensusfasta[which(row.names(consensusfasta)=="CON_OF_CONS"), polstart:(polstart+983)]
+}
+```
+
+```{r}
+transition<-function(nuc){
+    if (nuc=="a") return("g")
+    if (nuc=="g") return("a")
+    if (nuc=="c") return("t")
+    if (nuc=="t") return("c")
+}
+```
+#for each mutation, determine whether it is synonymous, non-synonymous or creates a stop
+
+```{r}
+typeofsitefunction<-function(WTcodon, mutantcodon){
+    WTAA<-translate(WTcodon)
+    MUTAA<-translate(mutantcodon)
+    if (WTAA == MUTAA) return ("syn")
+    else if (MUTAA == "*") return ("stop")
+    else return ("nonsyn")
+}
+```    
+
+```{r}
+filename="../Data/LosAlamosData//hiv-db_dataset5_wRef.fasta"
+patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file 
+
+#the 199th sequence is the reference. where is the start of pol? 
+
+startRT<-3*regexpr("PIS",paste(translate(patfasta[[199]][3:9868]),collapse=''))[1]
+startPro<-startRT-297
+
+allsequences<-which(names(patfasta)!="B.FR.1983.HXB2-LAI-IIIB-BRU.LAI")
+
+for (j in startRT:(startRT+400)){#for each site in the sequence
+    	WT=	patfasta[[199]][j] #what is WT at site j?
+        
+        count_Transition=0
+        for (i in allsequences){
+            if (!is.na(patfasta[[i]][j])&patfasta[[i]][j]==transition(WT)){count_Transition=count_Transition+1}
+        }
+            if (j%%3==0){WTcodon=patfasta[[199]][j:(j+2)];mutantcodon = c(transition(WT),WTcodon[2:3])}
+            if (j%%3==1){WTcodon=patfasta[[199]][(j-1):(j+1)];mutantcodon = c(WTcodon[1],transition(WT),WTcodon[3])}
+            if (j%%3==2){WTcodon=patfasta[[199]][(j-2):(j)];mutantcodon = c(WTcodon[1:2],transition(WT))}
+            typeofsite<-typeofsitefunction(WTcodon, mutantcodon)
+            print(paste(j,transition(WT),typeofsite, count_Transition))    
+        }
+        
+		freqPatSite[i,j]=length(which(patfasta[allsequences,j]!=WT))/length(allsequences)#if WT, what is freq of non WT at later time points?  ## kristof: any change, ts and tv
+        if (WT=="c"){freqPatTs[i,j]=length(which(patfasta[allsequences,j]=="t"))/length(allsequences)}   ## kristof only ts
+		if (WT=="t"){freqPatTs[i,j]=length(which(patfasta[allsequences,j]=="c"))/length(allsequences)}
+		if (WT=="a"){freqPatTs[i,j]=length(which(patfasta[allsequences,j]=="g"))/length(allsequences)}
+		if (WT=="g"){freqPatTs[i,j]=length(which(patfasta[allsequences,j]=="a"))/length(allsequences)}
+        if (WT=="a" | WT=="g"){freqPatTv[i,j]=length(which(patfasta[allsequences,j]=="c" | patfasta[allsequences,j]=="t"))/length(allsequences)}
+        if (WT=="c" | WT=="t"){freqPatTv[i,j]=length(which(patfasta[allsequences,j]=="a" | patfasta[allsequences,j]=="g"))/length(allsequences)}
+
+
+
+
+```
+
+
+library(seqinr)
+library(ape)
+
+read.dna("hiv-db_dataset5.fasta",format="fasta",as.matrix=TRUE)->x_dna
+read.dna("hiv-db_dataset5.fasta",format="fasta")->x_dna
+
+

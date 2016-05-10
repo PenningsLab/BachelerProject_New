@@ -1,0 +1,390 @@
+
+#Script to analyse the frequency data and associate with features. 
+Using the Bacheler et al data
+
+* Read the csv files 
+* Perform necessary calcuations
+* Plot results (eventually new script)
+
+Make sure to set your working directory to the correct folder
+Kristof: setwd('/Users/hopla/project-master/project/gitpleuni/bachelerProject/Rscripts')
+
+```{r}
+setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+source('./baseRscript.R')
+library(scales)
+library(plotrix)
+
+```
+
+Read the stored frequencies rather than calculating frequencies again
+```{r}
+if (TRUE){#read the stored data
+    #We read a file with WT .66 as threshold (only sites where at least 2/3 of the seqs at day 0 are WT are taken and a file with WT 0 as threshold, meaning no threshold)
+#read.table("../Output/freqPatTsInclDay0-threshold66.csv",sep=",",header=TRUE,row.names=1)->freqPatTs66
+#read.table("../Output/filterSummary66.csv",sep=",",header=TRUE,row.names=1)->filterSummary66
+#read.table("../Output/freqPatTsInclDay0-threshold0.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0 changed name of file
+read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+}
+
+#calculate mean frequencies
+#colMeansTs66<-apply(freqPatTs66, 2 , mean, na.rm=TRUE)
+#NumPats66Excluded<-apply(filterSummary66, 2 , function(x) length(which(x=="nonconsensus"))/length(x))
+#filterSummary66 used from createFrequencies-Bacheler.R
+colMeansTs0<-apply(freqPatTs0, 2 , mean, na.rm=TRUE)
+```
+
+Calculate mean freq for each site and bootstrap / no longer done
+```{r}
+#Get conf intervals by bootsstrapping
+#PSP Nov 11 2015: I don't think we need te bootstrapping, so I put it in an if (FALSE) statement.
+if (FALSE){
+btmeansTs<-data.frame(row.names=names(freqPatTs66)[1:984]) #each row is a site, each column is a bootstrapped mean
+numbootstraps=1000
+for (j in 1:984){# start with the first site
+    print(j)
+for (k in 1:numbootstraps){ # first iteration
+  btmeansTs[j,k]=mean(sample(freqPatTs66[,j],length(freqPatTs66[,j]),replace = TRUE),na.rm=TRUE)
+}}
+btmeansSorted<-t(apply(btmeansTs,1,sort))
+lowerConf<-btmeansSorted[,floor(0.025*numbootstraps)]
+upperConf<-btmeansSorted[,floor((1-0.025)*numbootstraps)]
+}
+```
+
+## Create overview dataframe and plot site frequency spectra 
+Only synonymous, non-synomous and stop codons are considered
+- for each mutation, determine whether it is synonymous, non-synonymous or creates a stop
+- add information on resistance  positions
+
+```{r}
+#PSP Nov 11 2015 I removed lowerConf and upperConf here because we no longer calculate them
+#x<-data.frame(num=1:984,colMeansTs,TypeOfSite,lowerConf,upperConf)
+#PSP Nov 11 2015 I renamed x OverviewDF and newdata OverviewDFOrderedByFreq
+OverviewDF<-data.frame(num=1:984,colMeansTs0,TypeOfSite)
+
+#Mut rates and sel coefficients
+read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
+OverviewDF$TSmutrate<-0
+OverviewDF$TSmutrate[OverviewDF$WTnt=="a"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="AG"]
+OverviewDF$TSmutrate[OverviewDF$WTnt=="c"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="CU"]
+OverviewDF$TSmutrate[OverviewDF$WTnt=="g"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="GA"]
+OverviewDF$TSmutrate[OverviewDF$WTnt=="t"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="UC"]
+
+for (i in 1:984){
+OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$colMeansTs0[i])}
+
+OverviewDF$WTnt<-consensusB
+#WT AAs 
+OverviewDF$WTAA<-""
+for (i in 1:984){
+    if (i%%3==1) OverviewDF$WTAA[i] = seqinr::translate(OverviewDF$WTnt[c(i,i+1,i+2)])
+    if (i%%3==2) OverviewDF$WTAA[i] = seqinr::translate(OverviewDF$WTnt[c(i-1,i,i+1)])
+    if (i%%3==0) OverviewDF$WTAA[i] = seqinr::translate(OverviewDF$WTnt[c(i-2,i-1,i)])
+}
+
+OverviewDF$MUTAA<-""
+#MUT AAs
+for (i in 1:984){
+    if (i%%3==1) OverviewDF$MUTAA[i] = seqinr::translate(c(transition(OverviewDF$WTnt[i]),OverviewDF$WTnt[c(i+1,i+2)]))
+    if (i%%3==2) OverviewDF$MUTAA[i] = seqinr::translate(c(OverviewDF$WTnt[c(i-1)],transition(OverviewDF$WTnt[i]),OverviewDF$WTnt[c(i+1)]))
+    if (i%%3==0) OverviewDF$MUTAA[i] = seqinr::translate(c(OverviewDF$WTnt[c(i-2,i-1)],transition(OverviewDF$WTnt[i])))
+}
+
+write.csv(OverviewDF,"../Output/OverviewSelCoeff_Bacheler.csv")
+
+#colors
+OverviewDFOrderedByFreq <- OverviewDF[order(colMeansTs0),] 
+OverviewDFOrderedByFreq$color<-""
+for (i in 1:984){
+    if (OverviewDFOrderedByFreq$TypeOfSite[i]=="syn") OverviewDFOrderedByFreq$color[i] = "darkolivegreen3"
+    if (OverviewDFOrderedByFreq$TypeOfSite[i]=="nonsyn") OverviewDFOrderedByFreq$color[i] = "red"
+    if (OverviewDFOrderedByFreq$TypeOfSite[i]=="stop") OverviewDFOrderedByFreq$color[i] = "black"
+    if (OverviewDFOrderedByFreq$TypeOfSite[i]=="res") OverviewDFOrderedByFreq$color[i] = "purple"
+}
+```
+
+Make a figure with all single site frequency spectra for Protease (and then RT)
+```{r}
+pdf("../Output/SingleSiteFrequencySpectraPRO.pdf",width=8,height=10)
+par(mfrow=c(3,3))
+for (i in 1:297){
+    #Site excluded bc too many non-consensus patients? Threshold = 10%
+    excluded = ""; if (NumPats66Excluded[i]>0.1) excluded = "(site excluded)"
+    resistancesite = ""; if (OverviewDFOrderedByFreq$TypeOfSite[which(OverviewDFOrderedByFreq$num==i)]=="res") resistancesite = "\n resistance codon, excluded"
+    #first create empty plot with title
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("Protease site", i,"\n","AA",ceiling(i/3),excluded,resistancesite),xlab="Frequency",ylab="Count")
+    #Next, show true height of 0 bar
+    if (length(which(freqPatTs66[,i]<0.02))>=70){
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)}
+    #next show all data (unfiltered), but only until 50 for 0 cat
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
+         col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)])
+    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), at = c(10,20,30,40,50,70), las=1)
+    if (length(which(freqPatTs0[,i]<0.02))>=70){
+    axis.break(axis=2,breakpos=60,bgcol="white",breakcol="black",style="slash",brw=0.02)
+    points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
+    }else{axis(2,labels = 60,at=60,las=1)}
+}
+dev.off()
+```
+
+Make a figure with all single site frequency spectra for RT
+```{r}
+pdf("../Output/SingleSiteFrequencySpectraRT.pdf",width=8,height=10)
+par(mfrow=c(3,3))
+for (i in 298:length(OverviewDFOrderedByFreq$color)){
+    #Site excluded bc too many non-consensus patients? Threshold = 10%
+    excluded = ""; if (NumPats66Excluded[i]>0.1) excluded = "(site excluded)"
+    resistancesite = ""; if (OverviewDFOrderedByFreq$TypeOfSite[which(OverviewDFOrderedByFreq$num==i)]=="res") resistancesite = "\n resistance codon, excluded"
+    #first create empty plot with title
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("RT site", i-297,"\n","AA",ceiling((i-297)/3),excluded,resistancesite),xlab="Frequency",ylab="Count")
+    #Next, show true height of 0 bar
+    if (length(which(freqPatTs66[,i]<0.02))>=70){
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)}
+    #next show all data (unfiltered), but only until 50 for 0 cat
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
+         col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)])
+    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), at = c(10,20,30,40,50,70), las=1)
+    if (length(which(freqPatTs0[,i]<0.02))>=70){
+    axis.break(axis=2,breakpos=60,bgcol="white",breakcol="black",style="slash",brw=0.02)
+    points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
+    }else{axis(2,labels = 60,at=60,las=1)}
+}
+dev.off()
+```
+
+PRO: Make the plots (transitions) for ranking
+```{r}
+pdf("../Output/ProteaseRanking.pdf",width = 13, height = 10)
+PROdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num<298,]
+#remove resistance mutations
+PROdata<-PROdata[PROdata$TypeOfSite!="res",]
+#remove positions with too many non-consensus patients
+which(NumPats66Excluded>0.1)->listSitesToExclude
+PROdata<-PROdata[-which(PROdata$num %in% listSitesToExclude),]
+plot(log(PROdata$colMeansTs0+0.001), main = "Protease mutant frequencies",
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
+points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
+axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
+dev.off()
+```
+
+Show the effect of our filtering out non-consensus patients at day 0
+```{r}
+pdf("../Output/ProteaseRanking_EffectFiltering.pdf",width = 13, height = 10)
+plot(log(PROdata$colMeansTs0+0.001), main = "Protease mutant frequencies",
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
+#points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
+#axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
+points(log(PROdata$colMeansTs66[order(PROdata$colMeansTs66)]+0.001),cex=1.5, pch = 16, col=alpha(PROdata$color, 0.3))
+dev.off()
+```
+
+RT: Make the plots (transitions) for rankng
+```{r}
+#pdf("../Output/RTRanking.pdf",width = 13, height = 10)
+RTdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num>=298,]
+RTdata<-RTdata[RTdata$TypeOfSite!="res",]
+#remove positions with too many non-consensus patients
+which(NumPats66Excluded>0.1)->listSitesToExclude
+RTdata<RTdata[-which(RTdata$num %in% listSitesToExclude),]
+plot(log(RTdata$colMeansTs0+0.001), main = "RT mutant frequencies",
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(RTdata$color, 1), xlab = "Nucleotides ordered by mean mutation 
+frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
+points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
+axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
+#dev.off()
+```
+
+Show the effect of our filtering out non-consensus patients at day 0
+```{r}
+pdf("../Output/RTRanking_EffectFiltering.pdf",width = 13, height = 10)
+plot(log(RTdata$colMeansTs0+0.001), main = "RT mutant frequencies",
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
+#points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
+#axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
+points(log(RTdata$colMeansTs66[order(RTdata$colMeansTs66)]+0.001),cex=1.5, pch = 16, col=alpha(RTdata$color, 0.3))
+dev.off()
+```
+
+Show distribution of fitness effects estimated
+```{r}
+par(mfrow=c(2,2))
+hist(log10(1.11*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="a"]),breaks= 20, xlim=c(-5,-0),ylim=c(0,70),col="red",main="A",xlab="sel coeff (10log)",ylab="count")
+hist(log10(2.41*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="c"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,20),col="red",main="C",xlab="sel coeff (10log)",ylab="count")
+hist(log10(5.48*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="g"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,30),col="red",main="G",xlab="sel coeff (10log)",ylab="count")
+hist(log10(1.11*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="t"]),breaks= 15,xlim=c(-5,-0),ylim=c(0,30),col="red",main="T",xlab="sel coeff (10log)",ylab="count")
+```
+
+### Make an AA variability map 
+```{r}
+translatedB<-seqinr::translate(consensusB)
+#convert the fasta files into AA sequences
+translatedfasta<-c()
+for (i in 1:length(listfastafiles)){ #for each fastafile 
+         filename=paste("../Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
+	       patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file       
+	       translatedfasta<-rbind(translatedfasta,t(apply(patfasta,1,function(x) seqinr::translate(x))))
+}
+```
+
+```{r}
+#determine for each codon position, the frequency of mutations compared to subtype B
+mutations<-c()
+for(m in 1:length(translatedB)){
+prevmut<-100-(length(which(translatedfasta[,m]==translatedB[m]))/nrow(translatedfasta)*100)
+mutations<-c(mutations,prevmut)
+}
+
+# Plot for protease including resistance positions
+plot(mutations[1:99],type='o',ylab='Mutation frequency (%)',xlab='AA position')
+# Plot for RT including resistance positions
+plot(mutations[ 100:328],type='o',ylab='Mutation frequency (%)',xlab='AA position',xaxt='n')
+axis(1,(100:328)-99,label=(100:328)-99)
+
+
+# Plot for RT excluding resistance positions and including resisatnce positions in red
+mutationposition<-cbind(1:229,mutations[100:328])
+plot(mutationposition[-c(sort(RTImuts$pos)),1],mutationposition[-c(sort(RTImuts$pos)),2],type='o',ylab='Mutation frequency (%)',xlab='AA position',xaxt='n')
+points(mutationposition[c(sort(RTImuts$pos)),1],mutationposition[c(sort(RTImuts$pos)),2],col='red')
+axis(1,(100:328)-99,label=(100:328)-99)
+```
+
+
+
+## Non-Syn plot 
+
+```{r}
+pdf("../Output/PR-nonsyn.pdf",width = 13, height = 10)
+PROdataNonSyn<-PROdata[PROdata$TypeOfSite=="nonsyn",]
+#Make plot of Protease 
+plot(PROdataNonSyn$num[order(PROdataNonSyn$num)],PROdataNonSyn$colMeansTs66[order(PROdataNonSyn$num)]+0.001,col=PROdataNonSyn$color[order(PROdataNonSyn$num)],pch=16,log="y",type="b", xlab = "Position in protease gene", ylab = "frequency non-synonymous transitions")#,ylim=c(0,max(PROdataNonSyn$colMeansTs66)))
+#Add moving mean
+for (i in 20:280){
+    range = (i-20):(i+20)
+#    points(i, mean(PROdataNonSyn$colMeansTs66[PROdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(PROdataNonSyn$colMeansTs66[PROdataNonSyn$num%in%range]), col="green",pch = 11, cex=2)
+}
+dev.off()
+
+RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
+plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs66[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
+
+#Add moving mean
+for (i in 370:900){
+    range = (i-20):(i+20)
+   # points(i, mean(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
+}
+
+i=370
+    range = (i-20):(i+20)
+```
+
+
+## Syn plot 
+
+```{r}
+pdf("../Output/PR-syn.pdf",width = 13, height = 10)
+PROdataSyn<-PROdata[PROdata$TypeOfSite=="syn",]
+#Make plot of Protease 
+plot(PROdataSyn$num[order(PROdataSyn$num)],PROdataSyn$colMeansTs66[order(PROdataSyn$num)]+0.001,col=PROdataSyn$color[order(PROdataSyn$num)],pch=16,
+     log="y",
+     type="b")#,ylim=c(0,max(PROdataNonSyn$colMeansTs66)))
+
+#Add moving mean
+for (i in 20:280){
+    range = (i-10):(i+10)
+    points(i, median(PROdataSyn$colMeansTs66[PROdataSyn$num%in%range]), col="blue",pch = 11, cex=2)
+}
+dev.off()
+```
+
+```{r}
+RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
+plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs66[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
+
+#Add moving mean
+for (i in 370:900){
+    range = (i-20):(i+20)
+   # points(i, mean(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
+}
+
+i=370
+    range = (i-20):(i+20)
+```
+
+```{r}
+pdf("../Output/RT-syn.pdf",width = 13, height = 10)
+RTdataSyn<-RTdata[RTdata$TypeOfSite=="syn",]
+#Make plot of RTtease 
+plot(RTdataSyn$num[order(RTdataSyn$num)],RTdataSyn$colMeansTs66[order(RTdataSyn$num)]+0.001,col=RTdataSyn$color[order(RTdataSyn$num)],pch=16,
+     log="y",
+     type="b", 
+    ylim = c(0.001,0.06)    )#,ylim=c(0,max(RTdataNonSyn$colMeansTs66)))
+#Add moving mean
+for (i in 370:900){
+    range = (i-10):(i+10)
+    points(i, median(RTdataSyn$colMeansTs66[RTdataSyn$num%in%range])+0.001, col="blue",pch = 11, cex=2)
+}
+dev.off()
+```
+
+```{r}
+AlldataSyn<-rbind(PROdata[PROdata$TypeOfSite=="syn",],RTdata[RTdata$TypeOfSite=="syn",])
+plot(AlldataSyn$num[order(AlldataSyn$num)],AlldataSyn$colMeansTs66[order(AlldataSyn$num)]+0.001,col=AlldataSyn$color[order(AlldataSyn$num)],pch=16,
+     log="y",
+     type="b", 
+    ylim = c(0.001,0.06)    )#,ylim=c(0,max(RTdataNonSyn$colMeansTs66)))
+#Add line for AA 82-107 from Mayrose paper
+lines(c(82*3,107*3),c(0.002,0.002),col=2,lwd=2)
+lines(c(7*3,31*3),c(0.002,0.002),col=2,lwd=2)
+
+
+```
+
+## RT
+RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
+plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs66[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
+
+#Add moving mean
+for (i in 370:900){
+    range = (i-20):(i+20)
+    points(i, mean(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
+    points(i, median(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
+}
+
+i=370
+    range = (i-20):(i+20)
+    
+```    
+
+
+
+# Next steps 
+Going to randomisations
+- frequency-ordered figure: does the coloring scheme hold?
+  
+- position-ordered figure: does the pattern hold?  
+    
+###For protease, which are the most deleterious non-syn sites? 
+To be done 
+Interesting? why? for therapy or vaccine. 
+
+###For protease, which are the most neutral non-syn sites? 
+corresponding to the expected frequency based on sequence length * mutation rate? Frequency should flucatuate aroudn the expected value? 
+
+#For protease, which are the most deleterious syn sites? 
+To be done : green colored sites with low frequ
+Interesting why?  HIV replication?
+
+
+
+
+

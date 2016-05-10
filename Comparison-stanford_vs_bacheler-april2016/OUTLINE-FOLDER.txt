@@ -1,0 +1,29 @@
+# Script explaining all below 
+
+Stanford-createFrequencies_TypeOfSite.html
+
+# Download files from Stanford, not preprocess
+
+PR.txt
+RT.txt
+
+# Fasta with selected sequences, distinguishing between naive and treated sequences. We will only work with the naive sequences in the following analysis 
+
+subtypeB-pr_naive_aligned.fasta
+subtypeB-pr_treated_aligned.fasta
+subtypeB-rt_naive_aligned.fasta
+subtypeB-rt_treated_aligned.fasta
+
+# File with frequencies for PR and RT from the Stanford dataset, matched with type of site and bacheler results 
+
+master-subtypeB-frequencies_stanford_bach_prrt_naive.csv
+
+# Some figures correlating frequencies for PR and RT, and syn vs nonsyn
+
+fig1.pdf                                                 
+fig2.pdf 
+fig3.pdf  
+fig4.pdf  
+fig5.pdf
+fig6.pdf
+fig7.pdf
