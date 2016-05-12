@@ -1,0 +1,63 @@
+----
+title: "Correlatinon global (Stanford) mutation frequencies with frequencies obtained by other studies "
+version: "May 2016"
+author: "Kristof Theys, Marion Hartl, Pleuni Pennings""
+output: html_document
+----
+
+# Output as end result 
+
+### Read in frequency values from Stanford
+
+```{r}
+stanford_threshold <-read.csv('../Output/freqPatTs_Stanford.csv')
+```
+
+### Read in mean frequency values from other datasets
+```{r}
+lehman_threshold_mean<-read.csv('../Output/OverviewSelCoeffLehman.csv')
+zanini_threshold_mean<-read.csv('../Output/OverviewSelCoeffZanini.csv')
+bacheler_threshold_mean<-read.csv('../Output/OverviewSelCoeff_Bacheler.csv')
+```
+
+### Comparison of frequencies 
+
+```{r}
+for (compare_dataset in list(bacheler_threshold_mean,zanini_threshold_mean,lehman_threshold_mean))
+  {
+compare_dataset_colmeans<-names(compare_dataset)[grep('colM',names(compare_dataset))]
+
+#remove first 24 positions of protease
+stanford_compare<-cbind(stanford_threshold,compare_dataset)
+#remove stop and res positions 
+stanford_compare_14<-stanford_compare[14:nrow(stanford_compare),]
+stanford_compare_14_stopres<-stanford_compare_14[stanford_compare_14$TypeOfSite!='res' & stanford_compare_14$TypeOfSite!='stop' ,]
+stanford_compare_14_stopres$TypeOfSite<-factor(stanford_compare_14_stopres$TypeOfSite)
+
+# color setting for plot 
+library(RColorBrewer)
+cols_all <- brewer.pal(nlevels(stanford_compare_14_stopres$TypeOfSite),"Set2")
+
+# plot and correlation coefficient for all positions 
+plot(stanford_compare_14_stopres$colMeansTs0_stanford,stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))],ylab=compare_dataset_colmeans,xlab='Stanford', col=cols_all[stanford_compare_14_stopres$TypeOfSite],lwd=2,main= paste("Stanford_vs_",compare_dataset_colmeans,sep=""))
+legend('topleft', legend = levels(stanford_compare_14_stopres$TypeOfSite), col = cols_all, cex = 0.8, pch = 1)
+text(0.4,0.6,paste("R-squared=",round(cor.test(stanford_compare_14_stopres$colMeansTs0_stanford,stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))])$estimate*cor.test(stanford_compare_14_stopres$colMeansTs0_stanford,stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))])$estimate,3)))
+#dev.off()
+
+# plot and correlation coefficient for all positions but LOG10 transformed to plot, not for the corr coef
+plot(log10(stanford_compare_14_stopres$colMeansTs0_stanford),log10(stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))]),ylab=compare_dataset_colmeans,xlab='Stanford', col=cols_all[stanford_compare_14_stopres$TypeOfSite],lwd=2,main= paste("Stanford_vs_",compare_dataset_colmeans," (log10 transformed)",sep=""))
+legend('topleft', legend = levels(stanford_compare_14_stopres$TypeOfSite), col = cols_all, cex = 0.8, pch = 1)
+text(-2,-0.5,paste("R-squared=",round(cor.test(stanford_compare_14_stopres$colMeansTs0_stanford,stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))])$estimate*cor.test(stanford_compare_14_stopres$colMeansTs0_stanford,stanford_compare_14_stopres[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres))])$estimate,3)))
+#dev.off()
+
+# ONLY SYN  
+stanford_compare_14_stopres_syn<-stanford_compare_14_stopres[stanford_compare_14_stopres$TypeOfSite=='syn',]
+plot(stanford_compare_14_stopres_syn$colMeansTs0_stanford,stanford_compare_14_stopres_syn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_syn))],ylab=compare_dataset_colmeans,xlab='Stanford', col=cols_all[stanford_compare_14_stopres_syn$TypeOfSite],lwd=2,main= paste("SYN:Stanford_vs_",compare_dataset_colmeans,sep=""))
+text(0.4,0.4,paste("R-squared=",round(cor.test(stanford_compare_14_stopres_syn$colMeansTs0_stanford,stanford_compare_14_stopres_syn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_syn))])$estimate*cor.test(stanford_compare_14_stopres_syn$colMeansTs0_stanford,stanford_compare_14_stopres_syn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_syn))])$estimate,3)))
+
+# ONLY NON-SYN 
+stanford_compare_14_stopres_nonsyn<-stanford_compare_14_stopres[stanford_compare_14_stopres$TypeOfSite=='nonsyn',]
+plot(stanford_compare_14_stopres_nonsyn$colMeansTs0_stanford,stanford_compare_14_stopres_nonsyn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_nonsyn))],ylab=compare_dataset_colmeans,xlab='Stanford', col=cols_all[stanford_compare_14_stopres_nonsyn$TypeOfSite],lwd=2,main= paste("NONSYN:Stanford_vs_",compare_dataset_colmeans,sep=""))
+text(0.4,0.4,paste("R-squared=",round(cor.test(stanford_compare_14_stopres_nonsyn$colMeansTs0_stanford,stanford_compare_14_stopres_nonsyn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_nonsyn))])$estimate*cor.test(stanford_compare_14_stopres_nonsyn$colMeansTs0_stanford,stanford_compare_14_stopres_nonsyn[,match(compare_dataset_colmeans,names(stanford_compare_14_stopres_nonsyn))])$estimate,3)))
+}
+```
