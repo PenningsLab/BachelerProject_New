@@ -1,0 +1,156 @@
+----
+title: "Creating fasta files from datasets downloaded from Stanford "
+version: "May 2016""
+author: "Kristof Theys, Marion Hartl, Pleuni Pennings""
+output: html_document
+----
+
+# Analysis using Stanford website data
+
+Final result of this file is the generation of 4 files, in fasta format, for PR naive, PR treated, RT naive and RT treated. >
+
+
+** Outline: what to be done** 
+
+1. download original txt files from database: PR.txt and RT.txt
+
+2. create 4 fasta files  (plus description of how you aligned them)
+
+
+
+## Protease download and fasta file generation 
+The dataset that you can download from Stanford (http://hivdb.stanford.edu/pages/geno-rx-datasets.html) is called. PR.txt and RT.txt (see below)
+
+We will process this file to remove non-B subtypes, empty sequences, treated sequences, multiple sequences per patient and sequences containing bad characters. 
+
+
+#### retrieve sequences from PR.xt and clean up 
+```{r,eval=F}
+data<-read.csv('PR.txt',sep=',')
+# only subtype B
+dataB<-subset(data,data$Subtype=='B')
+# remove empty sequences 
+dataBn<-subset(dataB,dataB$NASeq!="")
+# only naive sequences 
+dataBnaive<-subset(dataBn,dataBn$PIList=='None')
+dataBtreated<-subset(dataBn,dataBn$PIList!='None')
+# only 1 sequence per patient 
+dataBtreated_unique<-dataBtreated[!duplicated(dataBtreated$PtID),]
+dataBnaive_unique<-dataBnaive[!duplicated(dataBnaive$PtID),]
+# remove sequences with bad characters
+dataBnaive_unique2<-dataBnaive_unique[-grep('~',dataBnaive_unique$NASeq),]
+dataBtreated_unique2<-dataBtreated_unique#[-grep('~',dataBtreated_unique$NASeq),]
+
+# show evolution in size
+nrow(data);nrow(dataB);nrow(dataBn);nrow(dataBnaive);nrow(dataBnaive_unique);nrow(dataBtreated);nrow(dataBtreated_unique);nrow(dataBnaive_unique2);nrow(dataBtreated_unique2)
+
+# combine  identifier en sequence
+##export naive sequences but still not aligned
+dataBnaive_unique3<-cbind(as.character(dataBnaive_unique2$PtID),as.character(dataBnaive_unique2$NASeq))
+write.table(as.data.frame(dataBnaive_unique3),file='subtypeB-pr_naive.csv',row.names=F,quote=F,sep=',')
+##export treated sequences but still unaligned
+dataBtreated_unique3<-cbind(as.character(dataBtreated_unique2$PtID),as.character(dataBtreated_unique2$NASeq))
+write.table(as.data.frame(dataBtreated_unique3),file='subtypeB-pr_treated.csv',row.names=F,quote=F,sep=',')
+```
+
+
+#### generate a aligned fasta file from the sequences selected
+Several steps to convert the csv with sequences into a fasta file
+
+** to fasta format **
+vi subtypeB-pr_naive.csv # add >
+vi subtypeB-pr_treated.csv
+tr ',' '\n' < subtypeB-pr_naive.csv > subtypeB-pr_naive.fasta
+tr ',' '\n' < subtypeB-pr_treated.csv > subtypeB-pr_treated.fasta
+
+** transfer to server **
+scp *fasta cai:/home/ktheys0
+grep '\.' subtypeB-rt_naive.fasta  |wc
+
+** Align sequences using C++ library tool  **
+This tool for pairwise alignment against HXB2 is available at http://regatools.med.kuleuven.be/sequencetool/sequencetool.wt
+
+SequenceTool PR subtypeB-pr_naive.fasta --exportKind GlobalAlignment --exportAlphabet Nucleotides --exportWithInsertions no  > subtypeB-pr_naive_aligned.fasta
+SequenceTool PR subtypeB-pr_treated.fasta --exportKind GlobalAlignment --exportAlphabet Nucleotides --exportWithInsertions no  > subtypeB-pr_treated_aligned.fasta
+
+** remove the added HXB2 from alignement ** 
+vi subtypeB-pr_naive_aligned.fasta
+vi subtypeB-pr_treated_aligned.fasta
+
+** Convert nucleotide sequences to amino acids:   **
+SequenceTool PR subtypeB-pr_naive_aligned.fasta --exportKind PositionTable  > subtypeB-pr_naive_mut.csv
+SequenceTool PR subtypeB-pr_treated_aligned.fasta --exportKind PositionTable   > subtypeB-pr_treated_mut.csv
+
+** get from server  ** 
+scp cai:/home/ktheys0/subtypeB-pr* .      #fasta files
+scp cai:/home/ktheys0/subtypeB-pr*csv .   #mutation  files
+
+
+
+
+
+## Reverse transcriptase  download and fasta file generation 
+Similar steps as for the PR.txt file
+
+#### retrieve sequences from RT.txt
+```{r,eval=F}
+#same steps as for PR
+data<-read.csv('RT.txt',sep='\t')
+dataB<-subset(data,data$Subtype=='B')
+dataBn<-subset(dataB,dataB$NASeq!="")
+dataBnaive<-subset(dataBn,dataBn$RTIList=='None')
+dataBtreated<-subset(dataBn,dataBn$RTIList!='None')
+
+dataBnaive_unique<-dataBnaive[!duplicated(dataBnaive$PtID),]
+dataBtreated_unique<-dataBtreated[!duplicated(dataBtreated$PtID),]
+
+nrow(data);nrow(dataB);nrow(dataBn);nrow(dataBnaive);nrow(dataBnaive_unique);nrow(dataBtreated);nrow(dataBtreated_unique)
+
+# remove sequences with bad character
+dataBnaive_unique2<-dataBnaive_unique[-grep('~',dataBnaive_unique$NASeq),]
+dataBtreated_unique2<-dataBtreated_unique[-grep('~',dataBtreated_unique$NASeq),]
+
+# combine  identifier en sequence
+##export naive sequences but still not aligned
+dataBnaive_unique3<-cbind(as.character(dataBnaive_unique2$PtID),as.character(dataBnaive_unique2$NASeq))
+write.table(as.data.frame(dataBnaive_unique3),file='subtypeB-rt_naive.csv',row.names=F,quote=F,sep=',')
+##export treated sequences but still not aligned
+dataBtreated_unique3<-cbind(as.character(dataBtreated_unique2$PtID),as.character(dataBtreated_unique2$NASeq))
+write.table(as.data.frame(dataBtreated_unique3),file='subtypeB-rt_treated.csv',row.names=F,quote=F,sep=',')
+```
+
+#### generate a aligned fasta file from the sequences 
+vi to add '>' 
+tr ',' '\n' < subtypeB-rt_naive.csv > subtypeB-rt_naive.fasta
+tr ',' '\n' < subtypeB-rt_treated.csv > subtypeB-rt_treated.fasta
+
+** transfer to server ** 
+scp *fasta cai:/home/ktheys0
+grep '\.' subtypeB-rt_naive.fasta  |wc
+
+** pairwise alignment against HXB2 ** 
+SequenceTool RT subtypeB-rt_naive.fasta --exportKind GlobalAlignment --exportAlphabet Nucleotides --exportWithInsertions no  > subtypeB-rt_naive_aligned.fasta
+SequenceTool RT subtypeB-rt_treated.fasta --exportKind GlobalAlignment --exportAlphabet Nucleotides --exportWithInsertions no  > subtypeB-rt_treated_aligned.fasta
+
+** remove hxb2 sequence**
+vi subtypeB-rt_naive_aligned.fasta
+vi subtypeB-rt_treated_aligned.fasta
+
+** Convert nucleotide sequences to amino acids  **
+SequenceTool PR subtypeB-rt_naive_aligned.fasta --exportKind PositionTable  > subtypeB-rt_naive_mut.csv
+SequenceTool PR subtypeB-rt_treated_aligned.fasta --exportKind PositionTable   > subtypeB-rt_treated_mut.csv
+
+** download from server ** 
+scp cai:/home/ktheys0/subtypeB-rt*fasta .
+scp cai:/home/ktheys0/subtypeB-rt*csv .
+
+
+## Output 
+
+Creation of 4 fasta files: PR_naive, PR_treated, RT_naive, RT_treated
+
+
+
+
+
+
