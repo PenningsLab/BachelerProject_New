@@ -23,7 +23,7 @@
 
 #load relevant libraries and read consensusfasta file
 CurrentWD<-getwd()
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+setwd("~/Documents/Git/bachelerProject/Rscripts")
 
 library(ape)
 library(seqinr)
