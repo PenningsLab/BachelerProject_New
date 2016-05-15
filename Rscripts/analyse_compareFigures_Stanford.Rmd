@@ -31,10 +31,10 @@ for (compare_dataset in list(bacheler_threshold_mean,zanini_threshold_mean,lehma
 # identify the column with the frequency values   
 compare_dataset_colmeans<-names(compare_dataset)[grep('colM',names(compare_dataset))]
 
-#remove first 24 positions of protease
+#remove first 13 amino acid  positions of protease
 stanford_compare<-cbind(stanford_threshold,compare_dataset)
 #remove stop and res positions 
-stanford_compare_14<-stanford_compare[14:nrow(stanford_compare),]
+stanford_compare_14<-stanford_compare[40:nrow(stanford_compare),]
 stanford_compare_14_stopres<-stanford_compare_14[stanford_compare_14$TypeOfSite!='res' & stanford_compare_14$TypeOfSite!='stop' ,]
 stanford_compare_14_stopres$TypeOfSite<-factor(stanford_compare_14_stopres$TypeOfSite)
 stanford_compare_14_stopres$TypeOfSite<-relevel(stanford_compare_14_stopres$TypeOfSite,"syn")
@@ -74,10 +74,11 @@ text(0.4,0.4,paste("R-squared=",round(cor.test(stanford_compare_14_stopres_nonsy
 
 ## Official figure:Bacheler and Stanford, shown as normal and log transformed. 
 ```{r}
+library(plotrix)
 # making the data frame bacheler and stanford 
 stanford_bacheler<-cbind(stanford_threshold,bacheler_threshold_mean)
 #remove stop and res positions 
-stanford_bacheler_14<-stanford_bacheler[14:nrow(stanford_bacheler),]
+stanford_bacheler_14<-stanford_bacheler[40:nrow(stanford_bacheler),]
 stanford_bacheler_14_stopres<-stanford_bacheler_14[stanford_bacheler_14$TypeOfSite!='res' & stanford_bacheler_14$TypeOfSite!='stop' ,]
 stanford_bacheler_14_stopres$TypeOfSite<-factor(stanford_bacheler_14_stopres$TypeOfSite)
 stanford_bacheler_14_stopres$TypeOfSite<-relevel(stanford_bacheler_14_stopres$TypeOfSite,"syn")
@@ -91,13 +92,14 @@ legend('topleft', legend = levels(stanford_bacheler_14_stopres$TypeOfSite), col 
 
 
 # plot with log 10 transformd  values, corr coef calculated on non-log transformed values 
-
-#pdf('comparison_stanford_vs_bacher_axes.pdf')
+pdf('../Output/comparison_stanford_vs_bacher_axes.pdf')
 plot(log10(stanford_bacheler_14_stopres$colMeansTs0+0.0001),log10(stanford_bacheler_14_stopres$colMeansTs0_stanford+0.0001),ylab="Between-patient",xlab="Within-patient", col=cols_all[stanford_bacheler_14_stopres$TypeOfSite],lwd=2,main= "Within-patient vs between-patient frequencies",xaxt = "n",yaxt = "n",cex=0.8,cex.main =0.8)
-axis(1,at=(0:-4),c(0,expression(paste("10"^"-1")),expression(paste("10"^"-2")),expression(paste("10"^"-3")),expression(paste("10"^"-4"))),cex = 0.8)
-axis(2,at=(0:-4),c(0,expression(paste("10"^"-1")),expression(paste("10"^"-2")),expression(paste("10"^"-3")),expression(paste("10"^"-4"))),las=2,cex =0.8)
+axis(1,at=(0:-4),c(1,expression(paste("10"^"-1")),expression(paste("10"^"-2")),expression(paste("10"^"-3")),expression(paste("0"))),cex = 0.8)
+axis(2,at=(0:-4),c(1,expression(paste("10"^"-1")),expression(paste("10"^"-2")),expression(paste("10"^"-3")),expression(paste("0"))),las=2,cex =0.8)
+axis.break(axis=2,breakpos=-3.92,bgcol="white",breakcol="black",style="slash",brw=0.01)
+axis.break(axis=1,breakpos=-3.92,bgcol="white",breakcol="black",style="slash",brw=0.01)
 text(median(axTicks(1)),mean(tail(axTicks(2),2)),paste("R-squared=",round(cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate * cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate,3)),cex=0.8)
-#dev.off()
+dev.off()
 
 # plot with log 10 transformd  values, corr coef calculated on non-log transformed values 
 # same figures as the one above but using the 'log= 'yx' parameter 
