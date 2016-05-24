@@ -10,7 +10,8 @@ Make sure to set your working directory to the correct folder
 Kristof: setwd('/Users/hopla/project-master/project/gitpleuni/bachelerProject/Rscripts')
 
 ```{r}
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+setwd("~/Documents/Git/bachelerProject/Rscripts")
+#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
@@ -115,7 +116,7 @@ for (i in 1:297){
     #first create empty plot with title
     hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("Protease site", i,"\n","AA",ceiling(i/3),excluded,resistancesite),xlab="Frequency",ylab="Count")
     #Next, show true height of 0 bar
-    if (length(which(freqPatTs66[,i]<0.02))>=70){
+    if (length(which(freqPatTs0[,i]<0.02))>=70){
     hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)}
     #next show all data (unfiltered), but only until 50 for 0 cat
     hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
@@ -129,6 +130,30 @@ for (i in 1:297){
 dev.off()
 ```
 
+Make a figure with single site frequency spectra for Protease AA 58
+```{r}
+pdf("../Output/SingleSiteFrequencySpectraPRO_58.pdf",width=8,height=10)
+par(mfrow=c(1,3))
+for (i in 172:174){
+    #first create empty plot with title
+    #Shoudl be simplified!!
+    
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("Protease site", i,"\n","AA",ceiling(i/3)),xlab="Frequency",ylab="Count")
+    #Next, show true height of 0 bar
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)
+    #next show all data (unfiltered), but only until 50 for 0 cat
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
+         col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)])
+    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), at = c(10,20,30,40,50,70), las=1)
+    if (length(which(freqPatTs0[,i]<0.02))>=70){
+    axis.break(axis=2,breakpos=60,bgcol="white",breakcol="black",style="slash",brw=0.02)
+    points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
+    }else{axis(2,labels = 60,at=60,las=1)}
+}
+dev.off()
+```
+
+
 Make a figure with all single site frequency spectra for RT
 ```{r}
 pdf("../Output/SingleSiteFrequencySpectraRT.pdf",width=8,height=10)
@@ -140,7 +165,7 @@ for (i in 298:length(OverviewDFOrderedByFreq$color)){
     #first create empty plot with title
     hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("RT site", i-297,"\n","AA",ceiling((i-297)/3),excluded,resistancesite),xlab="Frequency",ylab="Count")
     #Next, show true height of 0 bar
-    if (length(which(freqPatTs66[,i]<0.02))>=70){
+    if (length(which(freqPatTs0[,i]<0.02))>=70){
     hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)}
     #next show all data (unfiltered), but only until 50 for 0 cat
     hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
