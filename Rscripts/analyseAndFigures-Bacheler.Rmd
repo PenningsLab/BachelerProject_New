@@ -20,18 +20,10 @@ library(plotrix)
 
 Read the stored frequencies rather than calculating frequencies again
 ```{r}
-if (TRUE){#read the stored data
-    #We read a file with WT .66 as threshold (only sites where at least 2/3 of the seqs at day 0 are WT are taken and a file with WT 0 as threshold, meaning no threshold)
-#read.table("../Output/freqPatTsInclDay0-threshold66.csv",sep=",",header=TRUE,row.names=1)->freqPatTs66
-#read.table("../Output/filterSummary66.csv",sep=",",header=TRUE,row.names=1)->filterSummary66
-#read.table("../Output/freqPatTsInclDay0-threshold0.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0 changed name of file
+#read the stored data
+#We read a file with WT 0 as threshold, meaning no threshold)
 read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
-}
-
 #calculate mean frequencies
-#colMeansTs66<-apply(freqPatTs66, 2 , mean, na.rm=TRUE)
-#NumPats66Excluded<-apply(filterSummary66, 2 , function(x) length(which(x=="nonconsensus"))/length(x))
-#filterSummary66 used from createFrequencies-Bacheler.R
 colMeansTs0<-apply(freqPatTs0, 2 , mean, na.rm=TRUE)
 ```
 
@@ -60,7 +52,6 @@ Only synonymous, non-synomous and stop codons are considered
 
 ```{r}
 #PSP Nov 11 2015 I removed lowerConf and upperConf here because we no longer calculate them
-#x<-data.frame(num=1:984,colMeansTs,TypeOfSite,lowerConf,upperConf)
 #PSP Nov 11 2015 I renamed x OverviewDF and newdata OverviewDFOrderedByFreq
 OverviewDF<-data.frame(num=1:984,colMeansTs0,TypeOfSite)
 
@@ -92,6 +83,30 @@ for (i in 1:984){
     if (i%%3==0) OverviewDF$MUTAA[i] = seqinr::translate(c(OverviewDF$WTnt[c(i-2,i-1)],transition(OverviewDF$WTnt[i])))
 }
 
+#Add whether AA change is drastic 
+OverviewDF$bigChange<-0
+
+for(i in 1:nrow(OverviewDF)){
+    WT <- amCat(OverviewDF[i,'WTAA'])
+    MUT <- amCat(OverviewDF[i,'MUTAA'])
+    if (WT == MUT){ OverviewDF$bigChange[i] <- 0 
+    }else{
+        OverviewDF$bigChange[i] <- 1
+    }
+}
+
+#Add whetehr makes CpG 
+OverviewDF$makesCpG <- 0
+for(i in 1:nrow(OverviewDF)){
+    trip <- OverviewDF$WTnt[c(i-1, i, i + 1)]
+    if(trip[1] == "c" & trip[2] == "a" ){
+        OverviewDF$makesCpG[i] <- 1
+    }
+    if(trip[2] == "t" & trip[3] == "g"){
+       OverviewDF$makesCpG[i] <- 1
+    }
+}
+
 write.csv(OverviewDF,"../Output/OverviewSelCoeff_Bacheler.csv")
 
 #colors
@@ -103,6 +118,22 @@ for (i in 1:984){
     if (OverviewDFOrderedByFreq$TypeOfSite[i]=="stop") OverviewDFOrderedByFreq$color[i] = "black"
     if (OverviewDFOrderedByFreq$TypeOfSite[i]=="res") OverviewDFOrderedByFreq$color[i] = "purple"
 }
+```
+
+Test whether G to A sites are more costly than A to G sites. 
+First: only syn sites
+```{r}
+SelCoeffSyn_a_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0]
+SelCoeffSyn_g_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0]
+ks.test(SelCoeffSyn_a_noCpG, SelCoeffSyn_g_noCpG,alternative = "greater")
+
+SelCoeffnonSyn_a_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
+SelCoeffnonSyn_g_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
+ks.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_g_noCpG_noBigC,alternative = "greater")
+
+SelCoeffnonSyn_c_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
+
+ks.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_c_noCpG_noBigC,alternative = "greater")
 ```
 
 Make a figure with all single site frequency spectra for Protease (and then RT)
@@ -132,19 +163,67 @@ dev.off()
 
 Make a figure with single site frequency spectra for Protease AA 58
 ```{r}
-pdf("../Output/SingleSiteFrequencySpectraPRO_58.pdf",width=8,height=10)
+ pdf("../Output/0.0030585683",width=8,height=4)
+cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
 par(mfrow=c(1,3))
 for (i in 172:174){
     #first create empty plot with title
-    #Shoudl be simplified!!
-    
-    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=0,border=0,main = paste("Protease site", i,"\n","AA",ceiling(i/3)),xlab="Frequency",ylab="Count")
+if (i == 172){
+    t=paste("C172T \n nonsense mutation",sep="")
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+    col=cols[1],border=0,
+#    main= bquote(paste(.(t),(C %->% T ))), cex=1.3,
+    main="",cex=1.2,
+    xlab="Frequency", ylab="Count",cex.lab=1.4)
+    title(t,cex=1.2,line=0)
+    }
+if (i == 173){
+    t=paste("A173G \n non-synonymous mutation",sep="")
+#    t=paste("Protease: site ", i,"\n non-synonymous mutation",sep="")
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+    col=cols[2],border=0,
+#    main = bquote(paste(.(t),(A %->% G ))), cex=1.3,
+    main= "", cex=1.2,
+    xlab="Frequency", ylab="Count",cex.lab=1.4)
+    title(t,cex=1.2,line=0)
+    }
+if (i == 174){
+    t=paste("G174A \n synonymous mutation",sep="")
+#    t=paste("Protease: site ", i,"\n synonymous mutation",sep="")
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+    col=cols[3],border=0,
+#    main = bquote(paste(.(t),(G %->% A ))), cex=1.3,
+    main= "", cex=1.2,
+    xlab="Frequency", ylab="Count",cex.lab=1.4)
+    title(t,cex=1.2,line=0)
+    }
     #Next, show true height of 0 bar
-    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)
+if (i == 172){
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+         yaxt="n",col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)],add=T)}
+if (i == 173){
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+         yaxt="n",col=cols[2],add=T)}
+if (i == 174){
+    hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+         yaxt="n",col=cols[3],add=T)}
     #next show all data (unfiltered), but only until 50 for 0 cat
-    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),breaks=seq(0,1,by=0.02),add=T,
-         col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)])
-    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), at = c(10,20,30,40,50,70), las=1)
+
+if (i == 172){
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+         breaks=seq(0,1,by=0.02),add=T,
+         col=OverviewDFOrderedByFreq$color[which(OverviewDFOrderedByFreq$num==i)])}
+if (i == 173){
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+         breaks=seq(0,1,by=0.02),add=T,
+         col=cols[2])}
+if (i == 174){
+    hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+         breaks=seq(0,1,by=0.02),add=T,
+         col=cols[3])}
+
+    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), 
+         at = c(10,20,30,40,50,70), las=1)
     if (length(which(freqPatTs0[,i]<0.02))>=70){
     axis.break(axis=2,breakpos=60,bgcol="white",breakcol="black",style="slash",brw=0.02)
     points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")

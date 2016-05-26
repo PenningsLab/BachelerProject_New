@@ -58,9 +58,9 @@ typeofsitefunction<-function(WTcodon, mutantcodon){
     else return ("nonsyn")
 }
 
-
 TypeOfSite<-c()
-for (codon in 1:(984/3)){#for each codon in the sequence
+for (codon in 1:13) TypeOfSite<-c(TypeOfSite,c("overlap","overlap","overlap"))
+for (codon in 14:(984/3)){#for each codon in the sequence
     positions <- c(codon*3-2,codon*3-1, codon*3)
     WTcodon <- consensusB[positions]
     mutant1codon <- c(transition(WTcodon[1]), WTcodon[2:3])
@@ -79,7 +79,31 @@ EstimatedS <- function(mu, meanfreq){
     else return (min(c(mu/meanfreq,1)))
 }
 
+#Amino acid changes
+pos <- "R|H|K"
+neg <- "D|E"
+unc <- "S|T|N|Q"
+spe <- "C|U|G|P"
+hyd <- "A|I|L|F|M|W|Y|V"
+amCat <- function(AA){
+    if(regexpr(pos, AA) > 0){ return(0) }
+    if(regexpr(neg, AA) > 0){ return(1) }
+    if(regexpr(unc, AA) > 0){ return(2) }
+    if(regexpr(spe, AA) > 0){ return(3) }
+    if(regexpr(hyd, AA) > 0){ return(4) }
+    return(5)
+}
 
+makesCpG <- rep(0, length = nrow(suppDat))
+for(i in 1:nrow(suppDat)){
+    trip <- suppDat$WTnt[c(i-1, i, i + 1)]
+    if(trip[1] == "c" & trip[2] == "a" ){
+        makesCpG[i] <- 1
+    }
+    if(trip[2] == "t" & trip[3] == "g"){
+        makesCpG[i] <- 1
+    }
+}
 
 
 
