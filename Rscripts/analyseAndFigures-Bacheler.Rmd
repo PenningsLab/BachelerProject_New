@@ -136,6 +136,51 @@ SelCoeffnonSyn_c_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="no
 ks.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_c_noCpG_noBigC,alternative = "greater")
 ```
 
+Make a figure with the selection coefficients across Protease
+```{r}
+par(mfrow=c(1,1))
+#make log scale
+plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],log="y", 
+     ylab="Cost (log scale)", xlab = "Position in Protease", xaxt="n"
+     )
+axis(1,at=3*c(14,35,55,75,95)-1,labels=c(14,35,55,75,95))
+#Add colors for different types of sites
+
+#A #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+#C #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[10])
+
+#A #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],pch=24,bg=brewer.pal(11, "Spectral")[11])
+
+#C #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],pch=24,bg=brewer.pal(11, "Spectral")[10])
+
+#T #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[9])
+
+#G #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[8])
+
+#A #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+#C #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+#A #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],pch=21,col=2,bg=brewer.pal(11, "Spectral")[6])
+
+#C #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],pch=21,col=2,bg=brewer.pal(11, "Spectral")[6])
+
+#ADD AA CHANGE OR NOT. 
+
+```
+
+
 Make a figure with all single site frequency spectra for Protease (and then RT)
 ```{r}
 pdf("../Output/SingleSiteFrequencySpectraPRO.pdf",width=8,height=10)

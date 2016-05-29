@@ -93,17 +93,3 @@ amCat <- function(AA){
     if(regexpr(hyd, AA) > 0){ return(4) }
     return(5)
 }
-
-makesCpG <- rep(0, length = nrow(suppDat))
-for(i in 1:nrow(suppDat)){
-    trip <- suppDat$WTnt[c(i-1, i, i + 1)]
-    if(trip[1] == "c" & trip[2] == "a" ){
-        makesCpG[i] <- 1
-    }
-    if(trip[2] == "t" & trip[3] == "g"){
-        makesCpG[i] <- 1
-    }
-}
-
-
-
