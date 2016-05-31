@@ -98,7 +98,7 @@ axis(1,at=(0:-4),c(1,expression(paste("10"^"-1")),expression(paste("10"^"-2")),e
 axis(2,at=(0:-4),c(1,expression(paste("10"^"-1")),expression(paste("10"^"-2")),expression(paste("10"^"-3")),expression(paste("0"))),las=2,cex.axis =1.2)
 axis.break(axis=2,breakpos=-3.92,bgcol="white",breakcol="black",style="slash",brw=0.01)
 axis.break(axis=1,breakpos=-3.92,bgcol="white",breakcol="black",style="slash",brw=0.01)
-text(median(axTicks(1)),mean(tail(axTicks(2),2)),paste("R-squared=",round(cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate * cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate,3)),cex=1)
+#text(median(axTicks(1)),mean(tail(axTicks(2),2)),paste("R-squared=",round(cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate * cor.test(stanford_bacheler_14_stopres$colMeansTs0,stanford_bacheler_14_stopres$colMeansTs0_stanford)$estimate,3)),cex=1)  # spearman instead of pearson should be used 
 #dev.off()
 
 # plot with log 10 transformd  values, corr coef calculated on non-log transformed values 
