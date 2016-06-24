@@ -38,6 +38,7 @@ consensusB<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"), pols
 consensusA<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_A1"), polstart:(polstart+983)]
 consensusC<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_C"), polstart:(polstart+983)]
 consofcons<-consensusfasta[which(row.names(consensusfasta)=="CON_OF_CONS"), polstart:(polstart+983)]
+consensus01AE<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_01_AE"), polstart:(polstart+983)]
 list.files(path="../Data/BachelerFiles/FASTAfiles/")->listfastafiles
 
 setwd(CurrentWD)

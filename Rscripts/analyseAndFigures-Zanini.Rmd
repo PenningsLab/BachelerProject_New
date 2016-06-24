@@ -9,7 +9,7 @@ Make sure to set your working directory to the correct folder
 Kristof: setwd('/Users/hopla/project-master/project/gitpleuni/bachelerProject/Rscripts')
 
 ```{r}
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
@@ -18,17 +18,7 @@ library(plotrix)
 
 Read the stored frequencies rather than calculating frequencies again
 ```{r}
-if (TRUE){#read the stored data
-    #We read a file with WT .66 as threshold (only sites where at least 2/3 of the seqs at day 0 are WT are taken and a file with WT 0 as threshold, meaning no threshold)
 read.table("../Output/freqPatTs_Zanini.csv",sep=",",header=TRUE,row.names=1)->freqPatTsZanini
-}
-
-#pdf("TRY.pdf")
-#par(mfrow=c(3,3))
-#for (i in 1:100) hist(freqPatTs_Zanini[,i],main=i,xlim=c(0,1),breaks=seq(0,1,by=0.01),col=2)
-#dev.off()
-
-#calculate mean frequencies
 colMeansTsZanini<-apply(freqPatTsZanini, 2 , mean, na.rm=TRUE)
 ```
 
@@ -45,6 +35,10 @@ numsitesZanini<-length(colMeansTsZanini)
 OverviewDFZanini<-data.frame(num=1:numsitesZanini,colMeansTsZanini)
 
 OverviewDFZanini$TypeOfSite<-TypeOfSite[1:numsitesZanini]
+OverviewDFZanini$TypeOfSite[1:39]<-"overlap"
+OverviewDFZanini$TypeOfSite[which(consensusB != consensusC | consensusC != consensus01AE)]<-"exclude"
+
+
 OverviewDFZanini$WTnt<-consensusB[1:numsitesZanini]
 
 #Mut rates and sel coefficients

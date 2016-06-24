@@ -24,7 +24,7 @@ Read the stored frequencies rather than calculating frequencies again
 #We read a file with WT 0 as threshold, meaning no threshold)
 read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
 #calculate mean frequencies
-colMeansTs0<-apply(freqPatTs0, 2 , mean, na.rm=TRUE)
+MeanFreq<-apply(freqPatTs0, 2 , mean, na.rm=TRUE)
 ```
 
 Calculate mean freq for each site and bootstrap / no longer done
@@ -53,7 +53,7 @@ Only synonymous, non-synomous and stop codons are considered
 ```{r}
 #PSP Nov 11 2015 I removed lowerConf and upperConf here because we no longer calculate them
 #PSP Nov 11 2015 I renamed x OverviewDF and newdata OverviewDFOrderedByFreq
-OverviewDF<-data.frame(num=1:984,colMeansTs0,TypeOfSite)
+OverviewDF<-data.frame(num=1:984,MeanFreq,TypeOfSite)
 
 #Mut rates and sel coefficients
 read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
@@ -64,7 +64,7 @@ OverviewDF$TSmutrate[OverviewDF$WTnt=="g"]<-mutrates$Probability[mutrates$Nucleo
 OverviewDF$TSmutrate[OverviewDF$WTnt=="t"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="UC"]
 
 for (i in 1:984){
-OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$colMeansTs0[i])}
+OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$MeanFreq[i])}
 
 OverviewDF$WTnt<-consensusB
 #WT AAs 
@@ -84,14 +84,14 @@ for (i in 1:984){
 }
 
 #Add whether AA change is drastic 
-OverviewDF$bigChange<-0
+OverviewDF$bigAAChange<-0
 
 for(i in 1:nrow(OverviewDF)){
     WT <- amCat(OverviewDF[i,'WTAA'])
     MUT <- amCat(OverviewDF[i,'MUTAA'])
-    if (WT == MUT){ OverviewDF$bigChange[i] <- 0 
+    if (WT == MUT){ OverviewDF$bigAAChange[i] <- 0 
     }else{
-        OverviewDF$bigChange[i] <- 1
+        OverviewDF$bigAAChange[i] <- 1
     }
 }
 
@@ -107,10 +107,12 @@ for(i in 1:nrow(OverviewDF)){
     }
 }
 
+OverviewDF$ProRT<-c(rep("Pro",297),rep("RT",687))
+OverviewDF$AAnum<-c(sort(rep(1:99,3)),sort(rep(1:229,3)))
 write.csv(OverviewDF,"../Output/OverviewSelCoeff_Bacheler.csv")
 
 #colors
-OverviewDFOrderedByFreq <- OverviewDF[order(colMeansTs0),] 
+OverviewDFOrderedByFreq <- OverviewDF[order(MeanFreq),] 
 OverviewDFOrderedByFreq$color<-""
 for (i in 1:984){
     if (OverviewDFOrderedByFreq$TypeOfSite[i]=="syn") OverviewDFOrderedByFreq$color[i] = "darkolivegreen3"
@@ -120,66 +122,262 @@ for (i in 1:984){
 }
 ```
 
+Test whether non syn muts, syn muts and nonsense muts are different in freq
+```{r}
+FreqsSyn<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="syn"]
+FreqsNonSyn<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="nonsyn"]
+FreqsStop<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="stop"]
+
+wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
+wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
+
+
+```
+
+
 Test whether G to A sites are more costly than A to G sites. 
 First: only syn sites
 ```{r}
 SelCoeffSyn_a_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0]
 SelCoeffSyn_g_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0]
-ks.test(SelCoeffSyn_a_noCpG, SelCoeffSyn_g_noCpG,alternative = "greater")
+wilcox.test(SelCoeffSyn_a_noCpG, SelCoeffSyn_g_noCpG,alternative = "less", paired = FALSE)
 
-SelCoeffnonSyn_a_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
-SelCoeffnonSyn_g_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
-ks.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_g_noCpG_noBigC,alternative = "greater")
 
-SelCoeffnonSyn_c_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$bigChange==0]
+SelCoeffnonSyn_a_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
+SelCoeffnonSyn_g_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
+wilcox.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_g_noCpG_noBigC,alternative = "less", paired = FALSE)
 
-ks.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_c_noCpG_noBigC,alternative = "greater")
+SelCoeffnonSyn_c_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
+
+wilcox.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_c_noCpG_noBigC,alternative = "less", paired = FALSE)
 ```
 
 Make a figure with the selection coefficients across Protease
 ```{r}
+pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
 par(mfrow=c(1,1))
 #make log scale
 plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],log="y", 
-     ylab="Cost (log scale)", xlab = "Position in Protease", xaxt="n"
-     )
+     ylab="Estimated Selection Coefficient (cost)", xlab = "Position in Protease", xaxt="n",yaxt="n",col="darkgrey",t="c",pch=".",
+     ylim=c(0.9*10^-5,1))
 axis(1,at=3*c(14,35,55,75,95)-1,labels=c(14,35,55,75,95))
+axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
 #Add colors for different types of sites
 
 #A #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
 
-#C #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[10])
-
-#A #SYN #CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],pch=24,bg=brewer.pal(11, "Spectral")[11])
-
-#C #SYN #CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],pch=24,bg=brewer.pal(11, "Spectral")[10])
+points(45,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[11])
+text(48,2*10^-5,pos=4,"A/T/C, syn, no CpG")
 
 #T #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[9])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+#C #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+#A #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],pch=24,bg=brewer.pal(11, "Spectral")[10])
+
+points(45,1.4*10^-5,pch=24,bg=brewer.pal(11, "Spectral")[10])
+text(48,1.4*10^-5,pos=4,"A/T, syn, CpG")
+
+#T #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297],pch=24,bg=brewer.pal(11, "Spectral")[10])
 
 #G #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0],pch=21,bg=brewer.pal(11, "Spectral")[8])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=25,bg=brewer.pal(11, "Spectral")[8],col=brewer.pal(11, "RdYlGn")[11])
+
+points(45,1*10^-5,pch=25,bg=brewer.pal(11, "Spectral")[8],col=brewer.pal(11, "RdYlGn")[11])
+text(48,1*10^-5,pos=4,"G, syn")
 
 #A #NONSYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
 
-#C #NONSYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+points(100,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[7],col=2)
+text(103,2*10^-5,pos=4,"A/T, non-syn, no drastic AA change")
+
+#T #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
 
 #A #NONSYN #CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1],pch=21,col=2,bg=brewer.pal(11, "Spectral")[6])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
 
-#C #NONSYN #CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==1],pch=21,col=2,bg=brewer.pal(11, "Spectral")[6])
+#T #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
 
-#ADD AA CHANGE OR NOT. 
+#With big AA change
 
+#A #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+points(100,1.4*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[5],col=2)
+text(103,1.4*10^-5,pos=4,"A/T, non-syn, drastic AA change")
+
+#T #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+#A #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+#T #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+
+#no big AA change
+
+#C #NONSYN no big AA change
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[3])
+
+points(100,1*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[3],col=2)
+text(103,1*10^-5,pos=4,"C, non-syn, no drastic AA change")
+
+#G #NONSYN no big AA change
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[1])
+
+points(200,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[1],col=2)
+text(203,2*10^-5,pos=4,"G, non-syn, no drastic AA change")
+
+#C #NONSYN bigAAChange
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[3])
+
+points(200,1.4*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[3],col=2)
+text(203,1.4*10^-5,pos=4,"C, non-syn, drastic AA change")
+
+#G #NONSYN bigAAChange
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num<=297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[1])
+
+points(200,1*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[1],col=2)
+text(203,1*10^-5,pos=4,"G, non-syn, drastic AA change")
+
+#nonsense
+points(OverviewDF$num[OverviewDF$TypeOfSite=="stop"&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="stop"&OverviewDF$num<=297],pch=22,col=2,bg=1)
+
+points(280,2*10^-5,pch=22,bg=1,col=1)
+text(283,2*10^-5,pos=4,"nonsense")
+
+#resistance
+points(OverviewDF$num[OverviewDF$TypeOfSite=="res"&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="res"&OverviewDF$num<=297],pch=8,col=1,bg=1)
+
+points(280,1.4*10^-5,pch=8,bg=1,col=1)
+text(283,1.4*10^-5,pos=4,"resistance")
+
+dev.off()
 ```
 
+Make a figure with the selection coefficients across RT
+```{r}
+pdf("../Output/EstSelCoeffRT.pdf",width=12,height=8)
+par(mfrow=c(1,1))
+#make log scale
+plot(OverviewDF$num[298:984],OverviewDF$EstSelCoeff[298:984],log="y", 
+     ylab="Estimated Selection Coefficient (cost)", xlab = "Position in Reverse Transcriptase", xaxt="n",yaxt="n",col="darkgrey",
+     t="c",pch=".",
+     ylim=c(0.9*10^-5,1))
+axis(1,at=298+3*seq(20,228,by=20)-1,labels=seq(20,228,by=20))
+axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
+#Add colors for different types of sites
+
+#A #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+points(298+45,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[11])
+text(298+48,2*10^-5,pos=4,"A/T/C, syn, no CpG")
+
+#T #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+#C #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+#A #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297],pch=24,bg=brewer.pal(11, "Spectral")[10])
+
+points(298+45,1.4*10^-5,pch=24,bg=brewer.pal(11, "Spectral")[10])
+text(298+48,1.4*10^-5,pos=4,"A/T, syn, CpG")
+
+#T #SYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297],pch=24,bg=brewer.pal(11, "Spectral")[10])
+
+#G #SYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297],pch=25,bg=brewer.pal(11, "Spectral")[8],col=brewer.pal(11, "RdYlGn")[11])
+
+points(298+45,1*10^-5,pch=25,bg=brewer.pal(11, "Spectral")[8],col=brewer.pal(11, "RdYlGn")[11])
+text(298+48,1*10^-5,pos=4,"G, syn")
+
+#A #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+points(298+180,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[7],col=2)
+text(298+183,2*10^-5,pos=4,"A/T, non-syn, no drastic AA change")
+
+#T #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+#A #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+#T #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[7])
+
+#With big AA change
+
+#A #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+points(298+180,1.4*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[5],col=2)
+text(298+183,1.4*10^-5,pos=4,"A/T, non-syn, drastic AA change")
+
+#T #NONSYN #no CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+#A #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+#T #NONSYN #CPG
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==1&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[5])
+
+
+#no big AA change
+
+#C #NONSYN no big AA change
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[3])
+
+points(298+180,1*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[3],col=2)
+text(298+183,1*10^-5,pos=4,"C, non-syn, no drastic AA change")
+
+#G #NONSYN no big AA change
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==0],pch=21,col=2,bg=brewer.pal(11, "Spectral")[1])
+
+points(298+400,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[1],col=2)
+text(298+403,2*10^-5,pos=4,"G, non-syn, no drastic AA change")
+
+#C #NONSYN bigAAChange
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[3])
+
+points(298+400,1.4*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[3],col=2)
+text(298+403,1.4*10^-5,pos=4,"C, non-syn, drastic AA change")
+
+#G #NONSYN bigAAChange
+points(OverviewDF$num[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$num>297&OverviewDF$bigAAChange==1],pch=22,col=2,bg=brewer.pal(11, "Spectral")[1])
+
+points(298+400,1*10^-5,pch=22,bg=brewer.pal(11, "Spectral")[1],col=2)
+text(298+403,1*10^-5,pos=4,"G, non-syn, drastic AA change")
+
+#nonsense
+points(OverviewDF$num[OverviewDF$TypeOfSite=="stop"&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="stop"&OverviewDF$num>297],pch=22,col=2,bg=1)
+
+points(298+620,2*10^-5,pch=22,bg=1,col=1)
+text(298+623,2*10^-5,pos=4,"nonsense")
+
+#resistance
+points(OverviewDF$num[OverviewDF$TypeOfSite=="res"&OverviewDF$num>297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="res"&OverviewDF$num>297],pch=8,col=1,bg=1)
+
+points(298+620,1.4*10^-5,pch=8,bg=1,col=1)
+text(298+623,1.4*10^-5,pos=4,"resistance")
+
+dev.off()
+```
 
 Make a figure with all single site frequency spectra for Protease (and then RT)
 ```{r}
@@ -277,7 +475,6 @@ if (i == 174){
 dev.off()
 ```
 
-
 Make a figure with all single site frequency spectra for RT
 ```{r}
 pdf("../Output/SingleSiteFrequencySpectraRT.pdf",width=8,height=10)
@@ -312,7 +509,7 @@ PROdata<-PROdata[PROdata$TypeOfSite!="res",]
 #remove positions with too many non-consensus patients
 which(NumPats66Excluded>0.1)->listSitesToExclude
 PROdata<-PROdata[-which(PROdata$num %in% listSitesToExclude),]
-plot(log(PROdata$colMeansTs0+0.001), main = "Protease mutant frequencies",
+plot(log(PROdata$MeanFreq+0.001), main = "Protease mutant frequencies",
      ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
 points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
@@ -323,7 +520,7 @@ dev.off()
 Show the effect of our filtering out non-consensus patients at day 0
 ```{r}
 pdf("../Output/ProteaseRanking_EffectFiltering.pdf",width = 13, height = 10)
-plot(log(PROdata$colMeansTs0+0.001), main = "Protease mutant frequencies",
+plot(log(PROdata$MeanFreq+0.001), main = "Protease mutant frequencies",
      ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
 #points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
@@ -340,7 +537,7 @@ RTdata<-RTdata[RTdata$TypeOfSite!="res",]
 #remove positions with too many non-consensus patients
 which(NumPats66Excluded>0.1)->listSitesToExclude
 RTdata<RTdata[-which(RTdata$num %in% listSitesToExclude),]
-plot(log(RTdata$colMeansTs0+0.001), main = "RT mutant frequencies",
+plot(log(RTdata$MeanFreq+0.001), main = "RT mutant frequencies",
      ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(RTdata$color, 1), xlab = "Nucleotides ordered by mean mutation 
 frequency", ylab = "Mean mutation frequency" , yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
@@ -352,7 +549,7 @@ axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
 Show the effect of our filtering out non-consensus patients at day 0
 ```{r}
 pdf("../Output/RTRanking_EffectFiltering.pdf",width = 13, height = 10)
-plot(log(RTdata$colMeansTs0+0.001), main = "RT mutant frequencies",
+plot(log(RTdata$MeanFreq+0.001), main = "RT mutant frequencies",
      ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
 #points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
@@ -364,13 +561,13 @@ dev.off()
 Show distribution of fitness effects estimated
 ```{r}
 par(mfrow=c(2,2))
-hist(log10(1.11*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="a"]),breaks= 20, xlim=c(-5,-0),ylim=c(0,70),col="red",main="A",xlab="sel coeff (10log)",ylab="count")
-hist(log10(2.41*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="c"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,20),col="red",main="C",xlab="sel coeff (10log)",ylab="count")
-hist(log10(5.48*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="g"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,30),col="red",main="G",xlab="sel coeff (10log)",ylab="count")
-hist(log10(1.11*10^-5/OverviewDF$colMeansTs0[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="t"]),breaks= 15,xlim=c(-5,-0),ylim=c(0,30),col="red",main="T",xlab="sel coeff (10log)",ylab="count")
+hist(log10(1.11*10^-5/OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="a"]),breaks= 20, xlim=c(-5,-0),ylim=c(0,70),col="red",main="A",xlab="sel coeff (10log)",ylab="count")
+hist(log10(2.41*10^-5/OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="c"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,20),col="red",main="C",xlab="sel coeff (10log)",ylab="count")
+hist(log10(5.48*10^-5/OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="g"]),breaks= 15, xlim=c(-5,-0),ylim=c(0,30),col="red",main="G",xlab="sel coeff (10log)",ylab="count")
+hist(log10(1.11*10^-5/OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="nonsyn"&consensusB=="t"]),breaks= 15,xlim=c(-5,-0),ylim=c(0,30),col="red",main="T",xlab="sel coeff (10log)",ylab="count")
 ```
 
-### Make an AA variability map 
+Make an AA variability map 
 ```{r}
 translatedB<-seqinr::translate(consensusB)
 #convert the fasta files into AA sequences
@@ -382,8 +579,8 @@ for (i in 1:length(listfastafiles)){ #for each fastafile
 }
 ```
 
+Determine for each codon position, the frequency of mutations compared to subtype B
 ```{r}
-#determine for each codon position, the frequency of mutations compared to subtype B
 mutations<-c()
 for(m in 1:length(translatedB)){
 prevmut<-100-(length(which(translatedfasta[,m]==translatedB[m]))/nrow(translatedfasta)*100)
@@ -404,10 +601,7 @@ points(mutationposition[c(sort(RTImuts$pos)),1],mutationposition[c(sort(RTImuts$
 axis(1,(100:328)-99,label=(100:328)-99)
 ```
 
-
-
-## Non-Syn plot 
-
+Non-Syn plot 
 ```{r}
 pdf("../Output/PR-nonsyn.pdf",width = 13, height = 10)
 PROdataNonSyn<-PROdata[PROdata$TypeOfSite=="nonsyn",]
@@ -436,8 +630,7 @@ i=370
 ```
 
 
-## Syn plot 
-
+Syn plot 
 ```{r}
 pdf("../Output/PR-syn.pdf",width = 13, height = 10)
 PROdataSyn<-PROdata[PROdata$TypeOfSite=="syn",]
@@ -453,67 +646,6 @@ for (i in 20:280){
 }
 dev.off()
 ```
-
-```{r}
-RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
-plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs66[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
-
-#Add moving mean
-for (i in 370:900){
-    range = (i-20):(i+20)
-   # points(i, mean(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
-    points(i, median(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
-}
-
-i=370
-    range = (i-20):(i+20)
-```
-
-```{r}
-pdf("../Output/RT-syn.pdf",width = 13, height = 10)
-RTdataSyn<-RTdata[RTdata$TypeOfSite=="syn",]
-#Make plot of RTtease 
-plot(RTdataSyn$num[order(RTdataSyn$num)],RTdataSyn$colMeansTs66[order(RTdataSyn$num)]+0.001,col=RTdataSyn$color[order(RTdataSyn$num)],pch=16,
-     log="y",
-     type="b", 
-    ylim = c(0.001,0.06)    )#,ylim=c(0,max(RTdataNonSyn$colMeansTs66)))
-#Add moving mean
-for (i in 370:900){
-    range = (i-10):(i+10)
-    points(i, median(RTdataSyn$colMeansTs66[RTdataSyn$num%in%range])+0.001, col="blue",pch = 11, cex=2)
-}
-dev.off()
-```
-
-```{r}
-AlldataSyn<-rbind(PROdata[PROdata$TypeOfSite=="syn",],RTdata[RTdata$TypeOfSite=="syn",])
-plot(AlldataSyn$num[order(AlldataSyn$num)],AlldataSyn$colMeansTs66[order(AlldataSyn$num)]+0.001,col=AlldataSyn$color[order(AlldataSyn$num)],pch=16,
-     log="y",
-     type="b", 
-    ylim = c(0.001,0.06)    )#,ylim=c(0,max(RTdataNonSyn$colMeansTs66)))
-#Add line for AA 82-107 from Mayrose paper
-lines(c(82*3,107*3),c(0.002,0.002),col=2,lwd=2)
-lines(c(7*3,31*3),c(0.002,0.002),col=2,lwd=2)
-
-
-```
-
-## RT
-RTdataNonSyn<-RTdata[RTdata$TypeOfSite=="nonsyn",]
-plot(RTdataNonSyn$num[order(RTdataNonSyn$num)],RTdataNonSyn$colMeansTs66[order(RTdataNonSyn$num)]+0.001,col=RTdataNonSyn$color[order(RTdataNonSyn$num)],pch=16,log="y",type="b")
-
-#Add moving mean
-for (i in 370:900){
-    range = (i-20):(i+20)
-    points(i, mean(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="blue",pch = 12, cex=3)
-    points(i, median(RTdataNonSyn$colMeansTs66[RTdataNonSyn$num%in%range]), col="green",pch = 11, cex=3)
-}
-
-i=370
-    range = (i-20):(i+20)
-    
-```    
-
 
 
 # Next steps 
@@ -532,8 +664,5 @@ corresponding to the expected frequency based on sequence length * mutation rate
 #For protease, which are the most deleterious syn sites? 
 To be done : green colored sites with low frequ
 Interesting why?  HIV replication?
-
-
-
 
 
