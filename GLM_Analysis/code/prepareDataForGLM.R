@@ -1,4 +1,4 @@
-#PSP: change this so that it reads the most current data at all times
+#PSP: Need to change this so that it reads the most current data at all times
 
 dat <- read.table("GLM_Analysis/dat/BachelerCountData.csv", sep = ",", stringsAsFactors = FALSE, header = TRUE)
 suppDat <- read.table("GLM_Analysis/dat/OverviewSelCoeffwProteinFeatures.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
@@ -68,6 +68,8 @@ colnames(datRows) <- names
 dim(datRows)
 #3355728
 
+#This part of dataprep only needs to be run once. 
+if (FALSE){ #THIS ONLY NEEDS TO RUN ONCE, TO CREATE "GLM_Analysis/dat/datFitModel.csv"
 relInd <- 1
 #Leave out the first 40 positions
 for(i in 40:length(suppDat$num)){
@@ -109,3 +111,7 @@ for(i in 40:length(suppDat$num)){
 
 
 write.csv(as.data.frame(datRows[which(!is.na(datRows[,1])),]),file = "GLM_Analysis/dat/datFitModel.csv")
+
+}
+
+read.csv("GLM_Analysis/dat/datFitModel.csv",row.names=1)->datFitModel

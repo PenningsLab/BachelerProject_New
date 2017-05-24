@@ -1,28 +1,28 @@
 #read prepared data
-read.csv("GLM_Analysis/dat/datFitModel.csv",row.names=1)->datFitModelRead
+read.csv("GLM_Analysis/dat/datFitModel.csv",row.names=1)->datFitModel
 
 fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
 
-#PSP: continue here. 
-
 sumOfModel <- summary(fullmodel.int)
-sumOfModel
+
+#Create a table for latex 
 require(xtable)
+#This doesn't work yet. 
+#write(xtable(sumOfModel, digits = 3), "ModelTable.txt")
 xtable(sumOfModel, digits = 3)
+
 modcoef <- sumOfModel$coef
 
 coef.vals <- modcoef[,1]
 coef.pSE.vals <- coef.vals + modcoef[,2]
 coef.mSE.vals <- coef.vals - modcoef[,2]
 
-sumOfModel
-colnames(datFitModel)
-
-t:CpG
-t:nonsyn:CpG
+#colnames(datFitModel)
+#t:CpG
+#t:nonsyn:CpG
 
 
-makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
+makeDataFrameToModify <- function(NsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
 
     atcg.mat <- as.data.frame(matrix(data = 0, ncol = ncol(datFitModel), nrow = 4))
     #ATCG elements
@@ -30,7 +30,7 @@ makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
     #Reserve the first column for intercept
     atcg.mat[,1] <- 1
     #synonymous or nonsynonymous mutation?
-    atcg.mat[,7] <- nsOrNo
+    atcg.mat[,7] <- NsOrNo
     #bigAA change?
     atcg.mat[,6] <- bigAAChangeOrNo * atcg.mat[,7]
     #CpG mutation or not
@@ -44,13 +44,14 @@ makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
 #    makeDataFrameToModify(1,1,1)[,rownames(modcoef)[c(1:17)]]
 #    rownames(modcoef)
 
-#    colnames(atcg.mat) <- rownames(modcoef)
+    #Pleuni: I uncommented this line. 
+    colnames(atcg.mat) <- rownames(modcoef)
 #    grep("nonsyn", )
 #    atcg.mat
 #    c('(Intercept)', names[2:(length(names))], paste(c("t", "c", "g"), ":nonsyn", sep = ""), "nonsyn:CpG", "t:CpG", "t:nonsyn:CpG" )
 
-    
-    names(atcg.mat) <- c('(Intercept)', names[2:(length(names))], paste(c("t", "c", "g"), ":nonsyn", sep = ""), "nonsyn:CpG", "t:CpG", "t:nonsyn:CpG" )
+#Pleuni: not sure what this does ...    
+#    names(atcg.mat) <- c('(Intercept)', names[2:(length(names))], paste(c("t", "c", "g"), ":nonsyn", sep = ""), "nonsyn:CpG", "t:CpG", "t:nonsyn:CpG" )
 
     return(as.matrix(atcg.mat))
 }
@@ -155,8 +156,6 @@ legend("topleft", c("CpG-forming", "non-CpG-forming", "Major AA change"), col = 
 dev.off()
 
 
-
-
 toPlot <- exp(makeDataFrameToModify(1, 1, 0)[,rownames(modcoef)] %*% as.matrix(modcoef[,1]))
 points(1:4, toPlot, col = cols[1], pch = pchpar, cex = cexpar)
 toPlot <- exp(makeDataFrameToModify(1, 0, 0)[,rownames(modcoef)] %*% as.matrix(modcoef[,1]))
@@ -164,19 +163,12 @@ points(1:4, toPlot, col = cols[2], pch = pchpar, cex = cexpar)
 toPlot <- exp(makeDataFrameToModify(1, 0, 1)[,rownames(modcoef)] %*% as.matrix(modcoef[,1]))
 points(1:4, toPlot, col = cols[3], pch = pchpar, cex = cexpar)
 
-
-
-
-
-modcoef[,1]
-exp(as.matrix(syn.atcg[,names(modcoef)]) %*% (modcoef[,1]))
-syn.atcg[,]
-
-syn.atcg[,]
-rownames(modcoef)[1]
-
-
-dim(datFitModel)
+#Pleuni commented this
+#modcoef[,1]
+#exp(as.matrix(syn.atcg[,names(modcoef)]) %*% (modcoef[,1]))
+#syn.atcg[,]
+#rownames(modcoef)[1]
+#dim(datFitModel)
 
 
 listofall <- list()
