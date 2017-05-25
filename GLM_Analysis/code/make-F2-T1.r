@@ -118,9 +118,9 @@ cat("\nFor example, A to G mutations that result in a drastic amino acid change 
 cat(round(MagChange[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat("times more costly than A to G mutations that do not (",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(Drastic[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(round(NotDrastic[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(       ").",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n") 
+cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(NotDrastic[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(       ").",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n") 
 cat("We observed similar fold changes for the other possible transitions.",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 #Pleuni: continue here
@@ -137,9 +137,9 @@ NewCpG/noNewCpG
 cat(        "\n\nPOINT 4\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("\nThere was also an effect of whether or not a non-synonymous mutation created a 
-CpG site ($p < 0.001$ for both A-G and T-C mutations). 
-The difference in frequencies suggests that, 
-among mutations that do not lead to a drastic amino acid change, 
+    CpG site ($p < 0.001$ for both A-G and T-C mutations). 
+    The difference in frequencies suggests that, 
+    among mutations that do not lead to a drastic amino acid change, 
     A-G mutations that create a CpG site are approximately" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(NewCpG[1]/noNewCpG[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        "times more costly than those that do not " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
@@ -148,14 +148,14 @@ cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep=
 cat(round(noNewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat(        "\n\nSimilarly, 
-among mutations that do not lead to a drastic amino acid change, 
+            among mutations that do not lead to a drastic amino acid change, 
             T-C mutations that create a CpG site are approximately " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(NewCpG[2]/noNewCpG[2],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat( "times more costly than those that do not" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(NewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
-    cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 
 #  Point 5
@@ -165,25 +165,23 @@ noNewCpG
 cat(        "\n\nPOINT 5\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat(        "\nWe estimated that, among non-synonymous mutations that do not involve a drastic amino acid change 
-or create a CpG site, 
+            or create a CpG site, 
             C-T mutations are \n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat(round(noNewCpG[3]/noNewCpG[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        "times more costly than A-G mutations " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[3],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(round(noNewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-        cat(        ", and G-A mutations are " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        ", and G-A mutations are " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[4]/noNewCpG[2],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        "times more costly than A-G mutations" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[4],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
-    cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 
-#Pleuni continue here. 
-    
-    #geeeeee
+#Make plots
 library(plotrix)
 require(RColorBrewer)
 pdf("GLM_Analysis/graphs/modeled_freqs_May2017_2.pdf", width = 12, height = 7)
@@ -220,7 +218,7 @@ plotVals.svals(0, 0, 0, cols[2], -.1)
 plotDat.svals(0, 1, 0, cols[1], .1)
 plotDat.svals(0, 0, 0, cols[2], -.1)
 abline(v = 1:3 + .5, col = "black")
-                                        #legend("topleft", c("CpG-forming", "non-CpG-forming"), col = cols[1:2], pch = 16, bg = "white")
+#legend("topleft", c("CpG-forming", "non-CpG-forming"), col = cols[1:2], pch = 16, bg = "white")
 legend("topleft", c("No drastic AA change (non-CpG-forming)", "No drastic AA change (CpG-forming)", "Drastic AA change (non-CpG-forming)",  "Drastic AA change (CpG-forming)"), col = cols[c(2,1,3,4)], pch = 16, bg = "white" )
 #legend("topleft", c("Same AA group (non-CpG-forming)", "Same AA group (CpG-forming)", "Changes AA group (non-CpG-forming)",  "Changes AA group (CpG-forming)"), col = cols[c(2,1,3,4)], pch = 16, bg = "white" )
 makePlot.svals(main = "Non-synonymous Sites")
@@ -236,82 +234,5 @@ abline(v = 1:3 + .5, col = "black")
 dev.off()
 
 
-
-#Print xtable for the model
-require(xtable)
-xtable(sumOfModel, digits = 3)
-
-
-#length(intersect(intersect(which(makesCpG == 1), which(suppDat$TypeOfSite == "nonsyn")), which(suppDat$WTnt == "a")))
-
-
-#Ok, let's the our real data values for Pleuni
-#Pleuni continue here. 
-
-prepMat <- matrix(data = NA, nrow = length(1:nrow(suppDat)), ncol = length(coef.vals))
-for(i in 1:nrow(suppDat)){
-    intercept <- 1
-    TCG <- c(0,0,0)
-    toReplace <- which(suppDat[i,]$WTnt == c("t", "c", "g"))
-    if(length(toReplace) > 0){
-        TCG[toReplace] <- 1
-    }
-    changeval <- bigChange[i]
-    inRTval <- as.numeric(suppDat[i,]$unit == "RT")
-    nonsynVal <- as.numeric(suppDat[i,]$TypeOfSite == "nonsyn")
-    shapeVal <- suppDatShape[i,]$SHAPE    
-    cpgval <- makesCpG[i]
-    TCGns <- TCG*nonsynVal
-    tCpG <- TCG[1] * cpgval
-    nonsynCpG <- cpgval*nonsynVal
-    nonsynCpGandT <- cpgval*nonsynVal*TCG[1]
-    prepMat[i,] <-  c(intercept, TCG, changeval, inRTval, nonsynVal, shapeVal, cpgval, TCGns, tCpG, nonsynCpG, nonsynCpGandT)
-}
-
-colnames(prepMat) <- names(coef.vals)
-t(t(prepMat[1:10,]))
-names(coef.vals)
-
-obsFreqs <- suppDat[-(1:40),]$colMeansTs0
-modFreqs <- exp(prepMat %*% coef.vals)[-(1:40)]
-cor.test(obsFreqs,modFreqs)
-
-#Let's try looking at synonymous mutations at ancestrally As
-
-layout(matrix(1:2, nrow = 1))
-relInds <- intersect(which(suppDat$WTnt == "a"), which(suppDat$TypeOfSite == "syn"))
-cpginds <- which(makesCpG[relInds] == 1)
-colsp <- rep("black", length(relInds))
-colsp[cpginds] <- "red"
-plot(suppDat[relInds,]$colMeansTs0, exp(prepMat[relInds,] %*% coef.vals), col = colsp)
-relInds <- intersect(which(suppDat$WTnt == "t"), which(suppDat$TypeOfSite == "syn"))
-cpginds <- which(makesCpG[relInds] == 1)
-colsp <- rep("black", length(relInds))
-colsp[cpginds] <- "red"
-plot(suppDat[relInds,]$colMeansTs0, exp(prepMat[relInds,] %*% coef.vals), col = colsp)
-
-#Maybe nonsyn mutations (big change v no?)
-require(RColorBrewer)
-par(mar = c(4, 4, 1, 8))
-plot(0, type = "n", xlim = c(0, .5), ylim = c(0, .041), xlab = "Observed frequency", ylab = "Modeled frequency")
-abline(0, 1)
-nucord <- c("a", "t", "c", "g")
-pcols <- brewer.pal(8, "Paired")
-for(i in  1:length(nucord)){
-    relInds <- intersect(which(suppDat$WTnt == nucord[i]), which(suppDat$TypeOfSite == "nonsyn"))
-    cpginds <- which(makesCpG[relInds] == 1)
-    bigaachanges <- which(bigChange[relInds] == 1)
-    pchp <- rep(1, length(relInds))
-    pchp[cpginds] <- 2
-    colsp <- rep(pcols[2*i - 1], length(relInds))
-    colsp[bigaachanges] <- pcols[2*i]
-    points(suppDat[relInds,]$colMeansTs0, exp(prepMat[relInds,] %*% coef.vals), col = colsp, pch = pchp, xlim = c(0, .025))
-}
-legend("bottomright", c("A", "A (big AA)", "T", "T (big AA)", "C", "C (big AA)", "G", "G (big AA)", "non-CpG-form", "CpG-form"), col = c(pcols, "black", "black"), pch = c(rep(16, 8), 1, 2), xpd = NA)
-#legend(.043, .02, c("A", "A (big AA)", "T", "T (big AA)", "C", "C (big AA)", "G", "G (big AA)", "non-CpG-form", "CpG-form"), col = c(pcols, "black", "black"), pch = c(rep(16, 8), 1, 2), xpd = NA)
-
-modelfits <- prepMat %*% coef.vals
-outmat <- cbind(suppDat, exp(modelfits))
-write.table(outmat, "../dat/dat.plus.modelfits.csv", sep = ",", col.names = TRUE, row.names = FALSE, quote = FALSE)
-
+#Look at modelPredTest.r It has code to look at how good the model predicts frequencies. Not very good. 
 
