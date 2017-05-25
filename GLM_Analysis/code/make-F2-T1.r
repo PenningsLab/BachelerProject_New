@@ -61,9 +61,10 @@ NonCpGSyn<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTva
 #Magnitude changes
 magchanges<-(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,1,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))/(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))
 
+cat(        "\n\nPOINT 1\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=FALSE,sep="\n")
 
 
-cat("Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are ",file = "GLM_Analysis/out/GLMResultsText.txt", append=FALSE)
+cat("Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are ",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE)
 cat(round(mean(magchanges[1:2])),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE)
 cat(" times more costly (selection coefficient appr. ",file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE)
 cat(round(mean(CpGSyn[1:2]),3),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE)
@@ -84,6 +85,8 @@ cat(round(mean(NonCpGSyn[2]),6),file = "GLM_Analysis/out/GLMResultsText.txt", ap
 
 # Point 2: Pleuni: not sure which point this is. 
 AGGA<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals)
+
+cat(        "\n\nPOINT 2\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("\n\nIndeed, the estimated selection coefficients based on model predictions suggested that synonymous G to A mutations are" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(AGGA[4]/AGGA[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
@@ -106,6 +109,7 @@ Drastic<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(1,0,1, avShape, inRTval)
 
 #Magnitude change:
 MagChange<-(mus/exp(makeDataFrameToModify.withSHAPEandinRT(1,0,1, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))/(mus/exp(makeDataFrameToModify.withSHAPEandinRT(1,0,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))
+cat(        "\n\nPOINT 3\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("\n\nIn general, mutations that led to a drastic amino acid change were found at lower frequency than mutations that did not ($p < 0.001$).",
     file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
@@ -130,13 +134,56 @@ NewCpG <- mus/exp(makeDataFrameToModify.withSHAPEandinRT(1,1,0, avShape, inRTval
 #Magnitude change
 NewCpG/noNewCpG
 
+cat(        "\n\nPOINT 4\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+cat("\nThere was also an effect of whether or not a non-synonymous mutation created a 
+CpG site ($p < 0.001$ for both A-G and T-C mutations). 
+The difference in frequencies suggests that, 
+among mutations that do not lead to a drastic amino acid change, 
+    A-G mutations that create a CpG site are approximately" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(NewCpG[1]/noNewCpG[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "times more costly than those that do not " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(NewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+cat(        "\n\nSimilarly, 
+among mutations that do not lead to a drastic amino acid change, 
+            T-C mutations that create a CpG site are approximately " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(NewCpG[2]/noNewCpG[2],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat( "times more costly than those that do not" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(NewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+    cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+
 #  Point 5
 #Non synonymous, non-CpG forming, does not change AA group:
 noNewCpG
 
+cat(        "\n\nPOINT 5\n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+cat(        "\nWe estimated that, among non-synonymous mutations that do not involve a drastic amino acid change 
+or create a CpG site, 
+            C-T mutations are \n" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+
+cat(round(noNewCpG[3]/noNewCpG[1],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "times more costly than A-G mutations " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[3],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+    cat(round(noNewCpG[1],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+        cat(        ", and G-A mutations are " ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[4]/noNewCpG[2],2),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(        "times more costly than A-G mutations" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[4],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+    cat(        "vs" ,file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
+    cat(round(noNewCpG[2],4),file = "GLM_Analysis/out/GLMResultsText.txt", append=TRUE,sep="\n")
 
 
-#geeeeee
+#Pleuni continue here. 
+    
+    #geeeeee
 library(plotrix)
 require(RColorBrewer)
 pdf("GLM_Analysis/graphs/modeled_freqs_May2017_2.pdf", width = 12, height = 7)
