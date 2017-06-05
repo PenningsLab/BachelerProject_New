@@ -133,23 +133,6 @@ wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 ```
 
 
-Test whether G to A sites are more costly than A to G sites. 
-First: only syn sites
-```{r}
-SelCoeffSyn_a_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0]
-SelCoeffSyn_g_noCpG<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0]
-wilcox.test(SelCoeffSyn_a_noCpG, SelCoeffSyn_g_noCpG,alternative = "less", paired = FALSE)
-
-
-SelCoeffnonSyn_a_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
-SelCoeffnonSyn_g_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
-wilcox.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_g_noCpG_noBigC,alternative = "less", paired = FALSE)
-
-SelCoeffnonSyn_c_noCpG_noBigC<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0]
-
-wilcox.test(SelCoeffnonSyn_a_noCpG_noBigC, SelCoeffnonSyn_c_noCpG_noBigC,alternative = "less", paired = FALSE)
-```
-
 Make a figure with the selection coefficients across Protease
 ```{r}
 pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
