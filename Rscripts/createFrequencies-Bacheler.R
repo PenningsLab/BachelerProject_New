@@ -10,18 +10,18 @@
 #only needed if the stored data are not O
 
 #Load libraries and necessary files from the baseRscript.Rmd
-source('baseRscript.R')
+source('Rscripts/baseRscript.R')
 
 #Read the correct fastafiles.
 
-listfastafiles<-list.files("../Data/BachelerFiles//FASTAfiles")
+listfastafiles<-list.files("Data/BachelerFiles//FASTAfiles")
 lengthlatersequenceslist<-c();lengthallsequenceslist<-c()
 
 ###############   
 #First, let's remove patients with too few sequences (less than 5). 
 Numseqs<-c()
 for (i in 1:length(listfastafiles)){ #for each fastafile
-    filename=paste("../Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
+    filename=paste("Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
     patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file
     Numseqs<-c(Numseqs,nrow(patfasta))
 }
@@ -37,15 +37,19 @@ filterSummary66<-data.frame(row.names=substr(listfastafiles,1,6))
 Nonconsensusday0_pat_pos<-c()
 ListPatientsWithoutData<-c()
 WTthreshold = 0.66 # we need at least 66% wt on day 0 to keep the position and the patient in the freqPatTs_threshold
-CountData<-data.frame(pat=character(), pos=integer(),WTnt=character(),MutCount=integer(),WTcount=integer(),stringsAsFactors = F)
+CountData<-data.frame(pat=character(), pos=integer(),WTnt=character(),MutCount=integer(),Totalcount=integer(),stringsAsFactors = F)
+CountData_filter<-data.frame(pat=character(), pos=integer(),WTnt=character(),MutCount=integer(),Totalcount=integer(),stringsAsFactors = F)
 
 ################
 #OK, now we go through the fasta files again to get the frequencies
 
-for (WTthreshold in c(0,0.66)){
+#Pleuni 05/17 continue here, add WTthreshold = 1
+
+#for (WTthreshold in c(0,0.66, 1)){
+for (WTthreshold in c(1)){
     for (i in 1:length(listfastafiles)){ #for each fastafile
 #    for (i in 1:2){ #for each fastafile
-        filename=paste("../Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
+        filename=paste("Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
         print(filename)
         patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file
         
@@ -56,7 +60,8 @@ for (WTthreshold in c(0,0.66)){
         allsequences=c(day0sequences,latersequences)
         
         for (j in 1:984){#for each site in the sequence
-            #print(paste('j',j))
+#        for (j in 1:41){#for each site in the sequence
+                #print(paste('j',j))
             WT =  consensusB[j] #what is WT at site j?
             transitionnuc = transition(WT) #which nuc is the transition mutation?
             #how many of the patfasta[day0sequences,j] are WT?
@@ -75,31 +80,34 @@ for (WTthreshold in c(0,0.66)){
                     goodsequences<-which(paste(patfasta[,j+1],patfasta[,j+2]) == paste(consensusB[c(j+1)],consensusB[(j+2)]))
                     freqPatTs_threshold[i,j]=length(which(patfasta[goodsequences,j]== transitionnuc))/length(goodsequences)
                     if (WTthreshold == 0)CountData[length(CountData[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
+                    if (WTthreshold == 1)CountData_filter[length(CountData_filter[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
                 }
                 if((j %in% seq(2,983,by=3))) {# second position
                     #use only those sequences that are WT at pos 1 and 3 of the triplet
                     goodsequences<-which(paste(patfasta[,j-1],patfasta[,j+1]) == paste(consensusB[c(j-1)],consensusB[(j+1)]))
                     freqPatTs_threshold[i,j]=length(which(patfasta[goodsequences,j]==transitionnuc))/length(goodsequences)
                     if (WTthreshold == 0)CountData[length(CountData[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
+                    if (WTthreshold == 1)CountData_filter[length(CountData_filter[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
                 }
                 if((j %in% seq(3,984,by=3))) {# third position
                     #use only those sequences that are WT at pos 1 and 2 of the triplet
                     goodsequences<-which(paste(patfasta[,j-2],patfasta[,j-1]) == paste(consensusB[c(j-2)],consensusB[(j-1)]))
                     freqPatTs_threshold[i,j]=length(which(patfasta[goodsequences,j]==transitionnuc))/length(goodsequences)
                     if (WTthreshold == 0)CountData[length(CountData[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
+                    if (WTthreshold == 1)CountData_filter[length(CountData_filter[,1])+1,]<-c(substr(listfastafiles[i],1,6),j,WT,length(which(patfasta[goodsequences,j]== transitionnuc)),length(goodsequences))
                 }
                 if (length(goodsequences)==0)  freqPatTs_threshold[i,j]<-NA
                 if (WTthreshold == 0.66) filterSummary66[i,j]<-length(goodsequences)
             }
         }
         if (WTthreshold == 0.66){
-            write.csv(freqPatTs_threshold,file="../Output/freqPatTsInclDay0-threshold66.csv")
-            write.csv(filterSummary66, file="../Output/filterSummary66.csv")
+            write.csv(freqPatTs_threshold,file="Output/freqPatTsInclDay0-threshold66.csv")
+            write.csv(filterSummary66, file="Output/filterSummary66.csv")
         }
-		#        if (WTthreshold == 0){write.csv(freqPatTs_threshold,file="../Output/freqPatTsInclDay0-threshold0.csv")} changed name of file
-		if (WTthreshold == 0){write.csv(freqPatTs_threshold,file="../Output/freqPatTs_Bacheler.csv")}
+		if (WTthreshold == 0){write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler.csv")}
+        if (WTthreshold == 1){write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler_filter.csv")}
     }
 }    
    
-write.csv(CountData,"../Output/BachelerCountData.csv")
-    
+#write.csv(CountData,"Output/BachelerCountData.csv")
+write.csv(CountData_filter,"Output/BachelerCountData_filter.csv")

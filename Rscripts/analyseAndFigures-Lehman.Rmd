@@ -9,7 +9,8 @@ Make sure to set your working directory to the correct folder
 Kristof: setwd('/Users/hopla/project-master/project/gitpleuni/bachelerProject/Rscripts')
 
 ```{r}
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
@@ -37,7 +38,14 @@ numsitesLehman<-length(colMeansTsLehman)
 OverviewDFLehman<-data.frame(num=1:(297+numsitesLehman),colMeansTsLehman=c(rep(NA,297),colMeansTsLehman))
 
 OverviewDFLehman$TypeOfSite<-TypeOfSite[1:(297+numsitesLehman)]
+OverviewDFLehman$TypeOfSite[1:39]<-"overlap"
+#remove sites that are different between A and B subtypes
+OverviewDFLehman$TypeOfSite[which(consensusB != consensusC | consensusA != consensusB)]<-"exclude"
+#remove sites with no data
+OverviewDFLehman$TypeOfSite[which(is.na(OverviewDFLehman$colMeansTsLehman))]<-"exclude"
+
 OverviewDFLehman$WTnt<-consensusB[1:(297+numsitesLehman)]
+
 
 #Mut rates and sel coefficients
 read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
@@ -76,9 +84,6 @@ for (i in 1:(297+numsitesLehman)){
 }
 
 write.csv(OverviewDFLehman,"../Output/OverviewSelCoeffLehman.csv")
-
-#remove sites that are different between A and B subtypes
-OverviewDFLehman<-OverviewDFLehman[which(consensusA==consensusB& consensusC==consensusB),]
 
 #colors
 OverviewDFLehmanOrderedByFreq <- OverviewDFLehman[order(OverviewDFLehman$colMeansTsLehman),] 

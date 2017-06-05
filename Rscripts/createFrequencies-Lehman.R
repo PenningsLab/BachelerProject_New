@@ -1,7 +1,8 @@
 #This R script reads the Lehman SRA fasta files and creates a csv file that has frequencies for each patient and each site for the transition mutations. 
 # We filter the data before writing the file. 
 
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+setwd("~/Documents/Git/bachelerProject/Rscripts")
 listLehmanfiles<-list.files("../Data/LehmanData/PleuniAlignments")
 
 SraRunInfo<-read.csv("../Data//LehmanData/SraRunInfo.csv")

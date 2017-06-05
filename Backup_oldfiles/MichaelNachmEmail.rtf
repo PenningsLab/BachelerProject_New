@@ -1,0 +1,24 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Dear Michael, \
+\
+Last month at BAPG you asked some questions about the data I showed in my presentation. Thanks for your interest! \
+\
+You were worried that a single patient with a fixed mutation could have a large effect on the mean frequency of the mutation. We are aware of this issue (and it happens, HIV infection is usually only with a single strain, so this extreme bottleneck leads to fixation of deleterious mutations \'96\'a0these then often get reversed later, see Zanini and Neher 2016 eLife). We therefore decided to filter the data in the following way: \
+\
+For most patients in this dataset, the sequences we have come from different time points, so it could be that we have 5 sequences from January, 5 sequences from April and 10 sequences from August of the same year. For most of the analysis these sequences are lumped together, but in a filtering step, we check that at the first time point, at least 2/3 of the sequences at the nucleotide of interest must be WT. If this is not the case, we ignore this nucleotide for this patient. If position is mostly wildtype at the first time point and mostly mutant later on, we assume that this is because there is really no cost associated with the mutation (of course, it may be even beneficial). \
+\
+There are sites where the mutant is probably truly neutral and we would expect a U-shaped frequency spectrum, since we are interested in costs of mutations, we filter out the sites where more than 10% of patients don\'92t carry the wildtype. \
+\
+The resulting frequency spectra look nicely L-shaped (see attached pdf). \
+Excluded frequencies are in white, when we excluded the entire site, this is shown in the title of the histogram. \
+\
+I hope this makes sense!\
+\
+Best, \
+\
+Pleuni}

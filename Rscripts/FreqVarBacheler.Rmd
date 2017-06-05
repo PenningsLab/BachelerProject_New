@@ -1,0 +1,53 @@
+---
+title: "Freqs_Variance_Bacheler"
+author: "Pleuni"
+date: "July 11, 2016"
+output: html_document
+---
+
+```{r}
+setwd("~/Documents/Git/bachelerProject/Rscripts")
+#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
+source('./baseRscript.R')
+library(scales)
+library(plotrix)
+
+```
+
+Read the stored frequencies rather than calculating frequencies again
+```{r}
+#read the stored data
+#We read a file with WT 0 as threshold, meaning no threshold)
+read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+#calculate mean frequencies
+MeanFreq<-apply(freqPatTs0, 2 , mean, na.rm=TRUE)
+OverviewDF<-data.frame(num=1:984,MeanFreq,TypeOfSite)
+OverviewDF$WTnt<-consensusB
+```
+
+Now let's get the variance of the frequencies in a new column. 
+```{r}
+OverviewDF$Var<-apply(freqPatTs0,2,var,na.rm=TRUE)
+OverviewDF$SD<-apply(freqPatTs0,2,sd,na.rm=TRUE)
+```
+
+Plot with color for diff nucs
+```{r}
+Nucs<-c("a","c","g","t")
+OverviewDF$Col<-sapply(OverviewDF$WTnt,function(x) which(Nucs==x))
+plot(OverviewDF$MeanFreq,OverviewDF$Var,log = "xy",col=OverviewDF$Col)
+for (x in 1:4){
+line=lm(OverviewDF$Var[OverviewDF$Col==x]~OverviewDF$MeanFreq[OverviewDF$Col==x])
+abline(line, col=x,untf=TRUE)}
+
+plot(OverviewDF$MeanFreq,OverviewDF$Var,col=OverviewDF$Col,xlim=c(0,0.01),ylim=c(0,0.002))
+for (x in 1:4){
+line=lm(OverviewDF$Var[OverviewDF$Col==x&OverviewDF$MeanFreq<0.1&OverviewDF$MeanFreq>0.02]~OverviewDF$MeanFreq[OverviewDF$Col==x&OverviewDF$MeanFreq<0.1&OverviewDF$MeanFreq>0.02])
+abline(line, col=x,untf=TRUE)}
+
+
+plot(OverviewDF$MeanFreq[OverviewDF$WTnt%in%c("a","g")],OverviewDF$SD[OverviewDF$WTnt%in%c("a","g")],col=OverviewDF$Col[OverviewDF$WTnt%in%c("a","g")],xlim=c(0,0.005),ylim=c(0,0.05))
+for (x in 1:4){
+line=lm(OverviewDF$SD[OverviewDF$Col==x&OverviewDF$MeanFreq<0.1&OverviewDF$MeanFreq>0.0]~OverviewDF$MeanFreq[OverviewDF$Col==x&OverviewDF$MeanFreq<0.1&OverviewDF$MeanFreq>0.0])
+abline(line, col=x,untf=TRUE)}
+```

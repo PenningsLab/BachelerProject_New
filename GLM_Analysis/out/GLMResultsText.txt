@@ -1,0 +1,88 @@
+Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are 4 times more costly (selection coefficient appr. 0.001) than non-CpG-creating synonymous mutations (selection coefficient ~0.00027 )).
+
+More detail 
+A-G mutations
+4.22
+0.0012
+0.000274
+
+C-T mutations
+4.05
+0.0011
+0.000265
+
+
+POINT 2
+
+
+
+Indeed, the estimated selection coefficients based on model predictions suggested that synonymous G to A mutations are
+2.41
+times as costly as non-CpG-forming A to G mutations (
+7e-04
+vs
+3e-04
+).
+
+ Note that p-values come from analyseAndFigures-Bacheler.Rmd
+
+
+POINT 3
+
+
+
+In general, mutations that led to a drastic amino acid change were found at lower frequency than mutations that did not ($p < 0.001$).
+
+For example, A to G mutations that result in a drastic amino acid change are roughly
+3.26
+times more costly than A to G mutations that do not (
+0.0017
+vs
+5e-04
+).
+We observed similar fold changes for the other possible transitions.
+
+
+POINT 4
+
+
+There was also an effect of whether or not a non-synonymous mutation created a 
+CpG site ($p < 0.001$ for both A-G and T-C mutations). 
+The difference in frequencies suggests that, 
+among mutations that do not lead to a drastic amino acid change, 
+    A-G mutations that create a CpG site are approximately
+1.58
+times more costly than those that do not 
+8e-04
+vs
+5e-04
+
+
+Similarly, 
+among mutations that do not lead to a drastic amino acid change, 
+            T-C mutations that create a CpG site are approximately 
+3.66
+times more costly than those that do not
+0.0017
+vs
+5e-04
+
+
+POINT 5
+
+
+We estimated that, among non-synonymous mutations that do not involve a drastic amino acid change 
+or create a CpG site, 
+            C-T mutations are 
+
+6.05
+times more costly than A-G mutations 
+0.0031
+vs
+5e-04
+, and G-A mutations are 
+3.87
+times more costly than A-G mutations
+0.0018
+vs
+5e-04
