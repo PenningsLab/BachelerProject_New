@@ -1,6 +1,8 @@
 #PSP: Need to change this so that it reads the most current data at all times
 
-dat <- read.table("GLM_Analysis/dat/BachelerCountData.csv", sep = ",", stringsAsFactors = FALSE, header = TRUE)
+#Use filtered data May 2017
+dat <- read.table("Output/BachelerCountData_filter.csv", sep = ",", stringsAsFactors = FALSE, header = TRUE)
+#dat <- read.table("GLM_Analysis/dat/BachelerCountData.csv", sep = ",", stringsAsFactors = FALSE, header = TRUE)
 suppDat <- read.table("GLM_Analysis/dat/OverviewSelCoeffwProteinFeatures.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 suppDatShape <- read.table("GLM_Analysis/dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
@@ -61,7 +63,7 @@ repMe <- function(pref, majormin, toRep){
 names = c( "a", "t", "c", "g", "inRT", "bigAAChange", "nonsyn", "stop", "res", "shape", "pairingprob", "CpG", "helix", "alpha", "beta", "coil", "minor")
 nucord <- c("a", "t", "c", "g")
 
-numRows <- sum(dat$WTcount) + sum(dat$MutCount)
+numRows <- sum(dat$Totalcount) + sum(dat$MutCount)
 datRows <- matrix(data = NA, nrow = numRows, ncol = length(names))
 colnames(datRows) <- names
 
@@ -69,7 +71,7 @@ dim(datRows)
 #3355728
 
 #This part of dataprep only needs to be run once. 
-if (FALSE){ #THIS ONLY NEEDS TO RUN ONCE, TO CREATE "GLM_Analysis/dat/datFitModel.csv"
+if (TRUE){ #THIS ONLY NEEDS TO RUN ONCE, TO CREATE "GLM_Analysis/dat/datFitModel.csv"
 relInd <- 1
 #Leave out the first 40 positions
 for(i in 40:length(suppDat$num)){
@@ -96,10 +98,12 @@ for(i in 40:length(suppDat$num)){
 		match.is <- which(dat[,3 ] == i)
 		for(j in unique(dat[,2])){
 			
-			toExp <- dat[intersect(which(dat[,2] == j), match.is),]
+			toExp <- dat[intersect(which(dat[,2] == j), match.is),] #PLEUNI WHAT IF THIS DOESN"T EXIST??
+			toReturn<-c()
+			if (length(toExp$X)){
 			minorNum <- toExp$MutCount
-			majorNum <- toExp$WTcount - minorNum
-			toReturn <- rbind(repMe(pref, 1, minorNum), repMe(pref, 0, majorNum))
+			majorNum <- toExp$Totalcount - minorNum #Pleuni 05/17 WTcount is actually the number of good sequences. So this is correct. 
+			toReturn <- rbind(repMe(pref, 1, minorNum), repMe(pref, 0, majorNum))}
 			
 			if(!is.null(toReturn)){
 				datRows[relInd:(relInd + nrow(toReturn) - 1),] <- toReturn
@@ -109,9 +113,11 @@ for(i in 40:length(suppDat$num)){
 	}
 }
 
-
-write.csv(as.data.frame(datRows[which(!is.na(datRows[,1])),]),file = "GLM_Analysis/dat/datFitModel.csv")
+#Pleuni changed this to write to results_filtered_data/
+write.csv(as.data.frame(datRows[which(!is.na(datRows[,1])),]),file = "GLM_Analysis/results_filtered_data/datFitModel.csv")
 
 }
 
-read.csv("GLM_Analysis/dat/datFitModel.csv",row.names=1)->datFitModel
+#read.csv("GLM_Analysis/dat/datFitModel.csv",row.names=1)->datFitModel
+#Pleuni changed this to read from results_filtered_data/
+read.csv("GLM_Analysis/results_filtered_data/datFitModel.csv",row.names=1)->datFitModel
