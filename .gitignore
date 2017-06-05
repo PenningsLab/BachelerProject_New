@@ -1,6 +1,8 @@
 #Large data files
 PR.txt
 RT.txt
+datFitModel.csv
+GLM_Analysis/dat/datFitModel.csv
 
 #History files
 .Rhistory
@@ -9,3 +11,4 @@ RT.txt
 # Session Data files
 .RData
 .DS_Store
+.Rproj.user
