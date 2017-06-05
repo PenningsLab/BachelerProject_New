@@ -1,4 +1,3 @@
-
 #Script to analyse the frequency data and associate with features. 
 Using the Bacheler et al data
 
@@ -6,12 +5,8 @@ Using the Bacheler et al data
 * Perform necessary calcuations
 * Plot results (eventually new script)
 
-Make sure to set your working directory to the correct folder
-Kristof: setwd('/Users/hopla/project-master/project/gitpleuni/bachelerProject/Rscripts')
-
 ```{r}
 setwd("~/Documents/Git/bachelerProject/Rscripts")
-#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
@@ -31,18 +26,20 @@ Calculate mean freq for each site and bootstrap / no longer done
 ```{r}
 #Get conf intervals by bootsstrapping
 #PSP Nov 11 2015: I don't think we need te bootstrapping, so I put it in an if (FALSE) statement.
+#PSP June 2017: it looks like we may need it after all. 
 if (FALSE){
-btmeansTs<-data.frame(row.names=names(freqPatTs66)[1:984]) #each row is a site, each column is a bootstrapped mean
-numbootstraps=1000
-for (j in 1:984){# start with the first site
-    print(j)
-for (k in 1:numbootstraps){ # first iteration
-  btmeansTs[j,k]=mean(sample(freqPatTs66[,j],length(freqPatTs66[,j]),replace = TRUE),na.rm=TRUE)
-}}
-btmeansSorted<-t(apply(btmeansTs,1,sort))
-lowerConf<-btmeansSorted[,floor(0.025*numbootstraps)]
-upperConf<-btmeansSorted[,floor((1-0.025)*numbootstraps)]
-}
+    btmeansTs<-data.frame(row.names=names(freqPatTs0)[1:984]) #each row is a site, each column is a bootstrapped mean
+    numbootstraps=100
+    for (j in 1:984){# start with the first site
+        print(j)
+        for (k in 1:numbootstraps){ # first iteration
+            btmeansTs[j,k]=mean(sample(freqPatTs0[,j],length(freqPatTs0[,j]),replace = TRUE),na.rm=TRUE)
+            }
+        }
+    btmeansSorted<-t(apply(btmeansTs,1,sort))
+    lowerConf<-btmeansSorted[,floor(0.025*numbootstraps)]
+    upperConf<-btmeansSorted[,floor((1-0.025)*numbootstraps)]
+    }
 ```
 
 ## Create overview dataframe and plot site frequency spectra 
@@ -52,8 +49,9 @@ Only synonymous, non-synomous and stop codons are considered
 
 ```{r}
 #PSP Nov 11 2015 I removed lowerConf and upperConf here because we no longer calculate them
+#PSP June 2017 added them again (lowerConf and upperConf)
 #PSP Nov 11 2015 I renamed x OverviewDF and newdata OverviewDFOrderedByFreq
-OverviewDF<-data.frame(num=1:984,MeanFreq,TypeOfSite)
+OverviewDF<-data.frame(num=1:984,MeanFreq,TypeOfSite,lowerConf,upperConf)
 
 #Mut rates and sel coefficients
 read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
@@ -64,7 +62,8 @@ OverviewDF$TSmutrate[OverviewDF$WTnt=="g"]<-mutrates$Probability[mutrates$Nucleo
 OverviewDF$TSmutrate[OverviewDF$WTnt=="t"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="UC"]
 
 for (i in 1:984){
-OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$MeanFreq[i])}
+    OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$MeanFreq[i])
+    }
 
 OverviewDF$WTnt<-consensusB
 #WT AAs 
@@ -130,7 +129,6 @@ FreqsStop<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="stop"]
 
 wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
 wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
-
 
 ```
 
