@@ -37,14 +37,22 @@ par(mfrow=c(1,1))
 #make log scale
 plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],
      log="y", ylab="Estimated Selection Coefficient (cost)", xlab = "Position in Protease", 
-     xaxt="n",yaxt="n",col="darkgrey",t="c",pch=".", ylim=c(0.9*10^-5,1))
+     xaxt="n",yaxt="n",
+     col="darkgrey",t="c",pch=".", ylim=c(0.9*10^-5,1))
 axis(1,at=3*c(14,35,55,75,95)-1,labels=c(14,35,55,75,95))
 axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
 #Add colors for different types of sites
 
 #A #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297,]
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+a=1:length(data$num)
+#PSP 2017 June use this to add conf intervals
+#arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$lowerConf[a],
+#       x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],
+#       code=3,length = 0.05,angle=90)
 
+#legend
 points(45,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[11])
 text(48,2*10^-5,pos=4,"A/T/C, syn, no CpG")
 
