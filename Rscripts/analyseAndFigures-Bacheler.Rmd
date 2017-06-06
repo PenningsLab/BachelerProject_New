@@ -10,6 +10,7 @@ setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
+library(RColorBrewer)
 
 ```
 
@@ -27,7 +28,7 @@ Calculate mean freq for each site and bootstrap / no longer done
 #Get conf intervals by bootsstrapping
 #PSP Nov 11 2015: I don't think we need te bootstrapping, so I put it in an if (FALSE) statement.
 #PSP June 2017: it looks like we may need it after all. 
-if (FALSE){
+if (TRUE){
     btmeansTs<-data.frame(row.names=names(freqPatTs0)[1:984]) #each row is a site, each column is a bootstrapped mean
     numbootstraps=100
     for (j in 1:984){# start with the first site
@@ -53,6 +54,8 @@ Only synonymous, non-synomous and stop codons are considered
 #PSP Nov 11 2015 I renamed x OverviewDF and newdata OverviewDFOrderedByFreq
 OverviewDF<-data.frame(num=1:984,MeanFreq,TypeOfSite,lowerConf,upperConf)
 
+OverviewDF$WTnt<-consensusB[1:984]
+
 #Mut rates and sel coefficients
 read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
 OverviewDF$TSmutrate<-0
@@ -65,7 +68,6 @@ for (i in 1:984){
     OverviewDF$EstSelCoeff[i] = EstimatedS(OverviewDF$TSmutrate[i],OverviewDF$MeanFreq[i])
     }
 
-OverviewDF$WTnt<-consensusB
 #WT AAs 
 OverviewDF$WTAA<-""
 for (i in 1:984){
@@ -129,18 +131,19 @@ FreqsStop<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="stop"]
 
 wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
 wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
-
 ```
 
 
 Make a figure with the selection coefficients across Protease
 ```{r}
-pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
+#pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
 par(mfrow=c(1,1))
+
+#PSP continue here. 
 #make log scale
-plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],log="y", 
-     ylab="Estimated Selection Coefficient (cost)", xlab = "Position in Protease", xaxt="n",yaxt="n",col="darkgrey",t="c",pch=".",
-     ylim=c(0.9*10^-5,1))
+plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],
+     log="y", ylab="Estimated Selection Coefficient (cost)", xlab = "Position in Protease", xaxt="n",yaxt="n",col="darkgrey",t="c",pch=".", ylim=c(0.9*10^-5,1))
+
 axis(1,at=3*c(14,35,55,75,95)-1,labels=c(14,35,55,75,95))
 axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
 #Add colors for different types of sites
@@ -243,7 +246,7 @@ points(OverviewDF$num[OverviewDF$TypeOfSite=="res"&OverviewDF$num<=297],Overview
 points(280,1.4*10^-5,pch=8,bg=1,col=1)
 text(283,1.4*10^-5,pos=4,"resistance")
 
-dev.off()
+#dev.off()
 ```
 
 Make a figure with the selection coefficients across RT
