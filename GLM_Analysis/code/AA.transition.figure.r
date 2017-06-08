@@ -133,6 +133,7 @@ opac = 50
 cols <- c(t.col(oldcols[1], opac), t.col(oldcols[2], opac),t.col(oldcols[3], opac),t.col(oldcols[4], opac))
 pchs <- c(16, 17)
 ylimval <- -12
+
 pdf("../out/aachangesNS.pdf", height = 5, width = 9)
 par(mar = c(5, 4, 1, 5))
 plot(0, type = "n", xlim = c(1, nrow(allComps)), ylim = c(ylimval, 0), axes = FALSE, ylab = "Estimated Selection Coefficient (cost)", xlab = "Mutation")

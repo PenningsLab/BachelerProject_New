@@ -46,7 +46,7 @@ CountData_filter<-data.frame(pat=character(), pos=integer(),WTnt=character(),Mut
 #Pleuni 05/17 continue here, add WTthreshold = 1
 
 #for (WTthreshold in c(0,0.66, 1)){
-for (WTthreshold in c(1)){
+for (WTthreshold in c(0)){
     for (i in 1:length(listfastafiles)){ #for each fastafile
 #    for (i in 1:2){ #for each fastafile
         filename=paste("Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
@@ -109,5 +109,5 @@ for (WTthreshold in c(1)){
     }
 }    
    
-#write.csv(CountData,"Output/BachelerCountData.csv")
-write.csv(CountData_filter,"Output/BachelerCountData_filter.csv")
+write.csv(CountData,"Output/BachelerCountData.csv")
+#write.csv(CountData_filter,"Output/BachelerCountData_filter.csv")
