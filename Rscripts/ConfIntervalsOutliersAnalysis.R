@@ -12,6 +12,8 @@ read.csv("../Output/OverviewSelCoeff_Bacheler.csv")->OverviewDF
 ytxt<-"Estimated Selection Coefficient (cost)"
 ylab<-c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0)
 
+perc = 0.1 #(show 10% outliers)
+
 #Make a figure with the selection coefficients across Protease
 
 OverviewDF$LC<-OverviewDF$lowerConf
@@ -33,7 +35,14 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3,plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt!="g"&OverviewDF$makesCpG==0&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
+#show outliers
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))]
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
+data$num[data$EstSelCoeff<=cutoff]
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -44,7 +53,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt!="g"&OverviewDF$makesCpG==1&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -55,7 +67,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -66,7 +81,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -77,7 +95,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==1&OverviewDF$bigAAChange==0&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -88,7 +109,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==1&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -99,7 +123,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==1&OverviewDF$bigAAChange==1&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -111,7 +138,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="c"|OverviewDF$WTnt=="g")&OverviewDF$bigAAChange==0&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
@@ -122,7 +152,10 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 
 mtext(side = 3, plottitle)
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="c"|OverviewDF$WTnt=="g")&OverviewDF$bigAAChange==1&OverviewDF$ProRT==ProRT,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
+#show outliers 
+cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
+points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
 a=1:length(data$num) #PSP 2017 June use this to add conf intervals
 arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$LC[a],x1=data$num[a],y1=data$TSmutrate[a]/data$upperConf[a],code=3,length = 0.05,angle=90)
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3,labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
