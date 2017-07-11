@@ -1,0 +1,1 @@
+g++ -o /Users/pleuni/Documents/Git/bachelerProject/ParedesDataA5095/Code_and_shellscript/HIVevolution_HIV1site /Users/pleuni/Documents/Git/bachelerProject/ParedesDataA5095/Code_and_shellscript/HIVevolution_HIV1site.cpp -I/usr/local/include/ -L /usr/local/lib/ -lgsl -lgslcblas

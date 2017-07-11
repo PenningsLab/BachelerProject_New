@@ -1,7 +1,8 @@
 
 #Feb 2016, my goal is to make simple SFS plot for talk on Saturday (BAPGXIII)
 
-setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/ParedesDataA5095")
+#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/ParedesDataA5095")
+setwd("~/Documents/Git/bachelerProject/ParedesDataA5095")
 
 Data<-read.csv("MeanFreqDataRanSubCohort.csv")
 
