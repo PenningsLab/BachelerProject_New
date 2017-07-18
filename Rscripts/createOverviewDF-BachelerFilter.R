@@ -1,7 +1,7 @@
 #Read the stored frequencies rather than calculating frequencies again
 #read the stored data
 #We read a file with WT 0 as threshold, meaning no threshold)
-read.table("../Output/freqPatTs_Bacheler_filter.csv",sep=",",header=TRUE,row.names=1)->freqPatTsFilter
+read.table("./Output/freqPatTs_Bacheler_Threshold05.csv",sep=",",header=TRUE,row.names=1)->freqPatTsFilter
 #calculate mean frequencies
 MeanFreq<-apply(freqPatTsFilter, 2 , mean, na.rm=TRUE)
 
@@ -102,3 +102,8 @@ for (i in 1:984){
 }
 
 write.csv(OverviewDFilter,"../Output/OverviewSelCoeff_BachelerFilter.csv")
+
+for (i in OverviewDFilter$num){
+    OverviewDFilter$FracFiltered[i]<-length(which(Nonconsensusday0_pat_pos[,2]==i))
+}
+plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)
