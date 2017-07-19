@@ -18,7 +18,8 @@ library(scales)
 library(plotrix)
 library(RColorBrewer)
 
-read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+#July 2017 now read freqPatTs_Bacheler_Threshold05.csv 
+read.table("../Output/freqPatTs_Bacheler_Threshold05.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
 read.csv("../Output/OverviewSelCoeff_Bacheler.csv")->OverviewDF
 
 #Test whether non syn muts, syn muts and nonsense muts are different in freq
@@ -268,7 +269,7 @@ dev.off()
 
 #Make a figure with single site frequency spectra for Protease AA 58
 
-pdf("../Output/SingleSiteFrequencySpectraPRO_58.pdf",width=8,height=4)
+pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
 cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
 par(mfrow=c(1,3))
 for (i in 172:174){
