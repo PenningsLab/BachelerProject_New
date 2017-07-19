@@ -26,11 +26,13 @@ for (i in 1:length(listfastafiles)){ #for each fastafile
     if (length(patfasta)>=5) NumseqsBach<-c(NumseqsBach,length(patfasta))#remove patients with fewer than 5 sequences
 }
 
-pdf ("comparisonDataSims.pdf")
-
+pdf ("comparisonDataSims_New.pdf")
+for (Ne in c(5000)){
+    #Ne = 10000 #currently Ne cannot be changed in the sims, has to be 10000 # 07/11/17 I changed it to 100000
+    
 listPvalues<-c()
 #Choose a site 
-for (site in 50:400){
+for (site in OverviewDF$num[OverviewDF$TypeOfSite%in%c("nonsyn","syn")]){
     print(site)
 realFreqs<-freqPatTsFilter[,site]
 
@@ -42,7 +44,6 @@ cost=OverviewDF$EstSelCoeff[site]
 #SimulationsEstimatingSelCoeffSims
 #To create simulated data. 
 
-Ne = 10000 #currently Ne cannot be changed in the sims, has to be 10000 # 07/11/17 I changed it to 100000
 numoutputs = length(NumseqsBach) #(max num of patients, should be around 200)
 theta = mu*Ne
 
@@ -57,11 +58,18 @@ x<-c(x,paste("numgen_inN=",(numoutputs+2)*outputfrequency/Ne,sep=""))
 x<-c(x,paste("start_output=",2*outputfrequency/Ne,sep=""))
 x<-c(x,paste("cost=",cost,sep=""))
 x<-c(x,paste("for seed in",seed))
+
+if (Ne == 1000)sentence = paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site1000 >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep="")
+if (Ne == 5000)sentence = paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site5000 >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep="")
+if (Ne == 10000)sentence = paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site10000 >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep="")
+if (Ne == 50000)sentence = paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site50000 >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep="")
+if (Ne == 100000)sentence = paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site100000 >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep="")
+
 x<-c(x,"do",
      "echo \"", "$seed", "$mu", "$cost",
-     "$output_every_Xgen", "$numgen_inN", "$start_output",
-     paste("\" | ./Code_and_shellscript/HIVevolution_HIV1site >./SimData/Data_T_", theta, "_cost_", cost,".txt",sep=""), 
+     "$output_every_Xgen", "$numgen_inN", "$start_output", sentence, 
      "done")
+
 write(x,file="./Code_and_shellscript/tempscript.sh")
 system("chmod 775 ./Code_and_shellscript/tempscript.sh")
 system("./Code_and_shellscript/tempscript.sh")     #Run tempscript.sh
@@ -124,11 +132,46 @@ mtext("Number of patients", side=2, line=2.5, cex.lab=1,las=3, col="black")
 abline(v=mean(simFreqs),col=2)
 
 listPvalues<-c(listPvalues,wilcox.test(simFreqs,realFreqs)[[3]])
+#listPvalues<-c(listPvalues,ks.test(simFreqs, realFreqs)[[2]])
 
+#ks.test(simFreqs, realFreqs)[[2]]
 }
-
-dev.off()
 
 qqnorm(listPvalues)
 qqline(listPvalues)
-length(which(listPvalues<.05))/length(listPvalues)
+print(paste("N",Ne,"num p values",round(length(which(listPvalues<.05))/length(listPvalues),3)))
+  
+if (Ne == 1000) listPvalues1000<-listPvalues 
+if (Ne == 5000) listPvalues5000<-listPvalues 
+if (Ne == 10000) listPvalues10000<-listPvalues 
+if (Ne == 50000) listPvalues50000<-listPvalues 
+if (Ne == 100000) listPvalues100000<-listPvalues 
+
+}    
+
+dev.off()
+
+for (Ne in c(1000,5000,10000,50000,100000)){
+
+    if (Ne == 1000) listPvalues1000->listPvalues 
+    if (Ne == 5000) listPvalues5000->listPvalues 
+    if (Ne == 10000) listPvalues10000->listPvalues 
+    if (Ne == 50000) listPvalues50000->listPvalues 
+    if (Ne == 100000) listPvalues100000->listPvalues 
+    
+    Freqs<-OverviewDF$MeanFreq[OverviewDF$num[OverviewDF$TypeOfSite%in%c("nonsyn","syn")]]
+    listPvalues[which(Freqs<median(Freqs))]
+    
+        
+#    print(paste("N",Ne,"fraction p values <5% low frequencies",
+#                round(length(which(listPvalues[which(Freqs<quantile(Freqs,0.75))]<.05))/length(which(!is.na(listPvalues[which(Freqs<quantile(Freqs,0.75))]))),3)
+#                      ))
+    
+#    print(paste("N",Ne,"fraction p values <5% high frequencies",
+#                round(length(which(listPvalues[which(Freqs>quantile(Freqs,0.75))]<.05))/length(which(!is.na(listPvalues[which(Freqs>quantile(Freqs,0.75))]))),3)
+#                        ))
+
+    print(paste("N",Ne,"fraction p values <5% all frequencies",
+                round(length(which(listPvalues<.05))/length(which(!is.na(listPvalues))),3)
+    ))
+}
