@@ -10,6 +10,7 @@
 #only needed if the stored data are not O
 
 #Load libraries and necessary files from the baseRscript.Rmd
+setwd("~/Documents/Git/bachelerProject")
 source('Rscripts/baseRscript.R')
 
 #Read the correct fastafiles.
@@ -39,7 +40,7 @@ if (length(which(Numseqs<5))>0){listfastafiles<-listfastafiles[-which(Numseqs<5)
 #Pleuni 05/17 continue here, add WTthreshold = 1
 #Pleuni July 2017: now think the threshold should be 0.5
 
-for (WTthreshold in c(0.5)){ #0 means no threshold
+for (WTthreshold in c(1)){ #0 means no threshold
 
     #make dataframe with frequencies for all non-muts for all patients for all sites filtered with the WT threshold.
     freqPatTs_threshold<-data.frame(row.names=substr(listfastafiles,1,6))

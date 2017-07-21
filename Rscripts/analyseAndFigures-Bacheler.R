@@ -18,9 +18,9 @@ library(scales)
 library(plotrix)
 library(RColorBrewer)
 
-#July 2017 now read freqPatTs_Bacheler_Threshold05.csv 
-read.table("../Output/freqPatTs_Bacheler_Threshold05.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
-read.csv("../Output/OverviewSelCoeff_Bacheler.csv")->OverviewDF
+#July 2017 now read freqPatTs_Bacheler_Threshold05.csv  and OverviewSelCoeff_BachelerFilter.csv
+read.table("../Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
 
 #Test whether non syn muts, syn muts and nonsense muts are different in freq
 
@@ -33,6 +33,7 @@ wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 
 #Make a figure with the selection coefficients across Protease
 
+if(FALSE){
 pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
 par(mfrow=c(1,1))
 #make log scale
@@ -150,10 +151,10 @@ points(280,1.4*10^-5,pch=8,bg=1,col=1)
 text(283,1.4*10^-5,pos=4,"resistance")
 
 dev.off()
-
+}
 
 #Make a figure with the selection coefficients across RT
-
+if (FALSE){
 pdf("../Output/EstSelCoeffRT.pdf",width=12,height=8)
 par(mfrow=c(1,1))
 #make log scale
@@ -264,19 +265,20 @@ points(298+620,1.4*10^-5,pch=8,bg=1,col=1)
 text(298+623,1.4*10^-5,pos=4,"resistance")
 
 dev.off()
-
-
+}
 
 #Make a figure with single site frequency spectra for Protease AA 58
 
 pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
+zerobar=50
 cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
-par(mfrow=c(1,3))
+par(mfrow=c(2,3))
 for (i in 172:174){
     #first create empty plot with title
     if (i == 172){
+        #par(fig=c(0,2/3,0,1))
         t=paste("C172T \n nonsense mutation",sep="")
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[1],border=0,
              #    main= bquote(paste(.(t),(C %->% T ))), cex=1.3,
              main="",cex=1.2,
@@ -286,7 +288,7 @@ for (i in 172:174){
     if (i == 173){
         t=paste("A173G \n non-synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n non-synonymous mutation",sep="")
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[2],border=0,
              #    main = bquote(paste(.(t),(A %->% G ))), cex=1.3,
              main= "", cex=1.2,
@@ -296,43 +298,73 @@ for (i in 172:174){
     if (i == 174){
         t=paste("G174A \n synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n synonymous mutation",sep="")
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),yaxt="n",
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[3],border=0,
              #    main = bquote(paste(.(t),(G %->% A ))), cex=1.3,
              main= "", cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
         title(t,cex=1.2,line=0)
     }
-    #Next, show true height of 0 bar
+    #Next, show  0 bar
     if (i == 172){
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
              yaxt="n",col=OverviewDF$color[which(OverviewDF$num==i)],add=T)}
     if (i == 173){
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
              yaxt="n",col=cols[2],add=T)}
     if (i == 174){
-        hist(rep(0,70),breaks=seq(0,1,by=0.02),xlim=c(0,1),ylim=c(0,70),
+        hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
              yaxt="n",col=cols[3],add=T)}
-    #next show all data (unfiltered), but only until 50 for 0 cat
     
+    #next show all data (unfiltered), but only until 50 for 0 cat
     if (i == 172){
-        hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+        hist(c(rep(0,min(zerobar-10,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
              breaks=seq(0,1,by=0.02),add=T,
              col=OverviewDF$color[which(OverviewDF$num==i)])}
     if (i == 173){
-        hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+        hist(c(rep(0,min(zerobar-10,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
              breaks=seq(0,1,by=0.02),add=T,
              col=cols[2])}
     if (i == 174){
-        hist(c(rep(0,min(60,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
+        hist(c(rep(0,min(zerobar-10,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
              breaks=seq(0,1,by=0.02),add=T,
              col=cols[3])}
     
-    axis(2,labels = c(10,20,30,40,50,max(70,length(which(freqPatTs0[,i]<0.02)))), 
-         at = c(10,20,30,40,50,70), las=1)
-    if (length(which(freqPatTs0[,i]<0.02))>=70){
-        axis.break(axis=2,breakpos=60,bgcol="white",breakcol="black",style="slash",brw=0.02)
-        points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
-    }else{axis(2,labels = 60,at=60,las=1)}
+    axis(2,labels = c(10,20,30,max(zerobar,length(which(freqPatTs0[,i]<0.02)))), 
+         at = c(10,20,30,zerobar), las=1)
+    if (length(which(freqPatTs0[,i]<0.02))>=zerobar){
+        axis.break(axis=2,breakpos=zerobar-10,bgcol="white",breakcol="black",style="slash",brw=0.02)
+        points(c(0.01,0.02),c(zerobar-10,zerobar-10),pch=15,cex=2.5,col="white")
+    }else{axis(2,labels = zerobar-10,at=zerobar-10,las=1)}
+    
 }
+#next, show simulated frequencies
+#    par(fig=c(2/3,1,0,1), new = TRUE)
+for (i in 172:174){
+    if (i ==172)Freqs<-read.csv("../Output/SimFreqs172.csv",row.names=1)[1][,1]
+    if (i ==173)Freqs<-read.csv("../Output/SimFreqs173.csv",row.names=1)[1][,1]
+    if (i ==174)Freqs<-read.csv("../Output/SimFreqs174.csv",row.names=1)[1][,1]
+    t=paste("simulated data",sep="")
+    hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
+         col=cols[1],border=0,
+         main="",cex=1.2,
+         xlab="Frequency", ylab="Count",cex.lab=1.4)
+    title(t,cex=1.2,line=0)
+    
+    hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
+         yaxt="n",col="pink",add=T)
+    hist(c(rep(0,
+               min(zerobar,length(which(Freqs<0.02)))
+               ),
+           Freqs[which(Freqs>=0.02)]),
+         breaks=seq(0,1,by=0.02),add=T,
+        col="pink")
+    axis(2,labels = c(10,20,30,max(zerobar,length(which(Freqs<0.02)))), 
+     at = c(10,20,30,zerobar), las=1)
+    if (length(which(Freqs<0.02))>=zerobar){
+    axis.break(axis=2,breakpos=zerobar-10,bgcol="white",breakcol="black",style="slash",brw=0.02)
+    points(c(0.01,0.02),c(zerobar-10,zerobar-10),pch=15,cex=2.5,col="white")
+    }else{axis(2,labels = zerobar-10,at=zerobar-10,las=1)}
+}
+
 dev.off()

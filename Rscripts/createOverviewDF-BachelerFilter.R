@@ -1,7 +1,9 @@
 #Read the stored frequencies rather than calculating frequencies again
 #read the stored data
-#We read a file with WT 0 as threshold, meaning no threshold)
-read.table("./Output/freqPatTs_Bacheler_Threshold05.csv",sep=",",header=TRUE,row.names=1)->freqPatTsFilter
+#We read a file with WT 0 as threshold, meaning no threshold freqPatTs_Bacheler_Threshold05.csv)
+
+setwd("~/Documents/Git/bachelerProject/")
+read.table("./Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTsFilter
 #calculate mean frequencies
 MeanFreq<-apply(freqPatTsFilter, 2 , mean, na.rm=TRUE)
 
@@ -37,7 +39,7 @@ OverviewDFilter<-data.frame(num=1:984,MeanFreq,TypeOfSite,lowerConf,upperConf)
 OverviewDFilter$WTnt<-consensusB[1:984]
 
 #Mut rates and sel coefficients
-read.csv("../Data/HIVMutRates/HIVMutRates.csv")->mutrates
+read.csv("./Data/HIVMutRates/HIVMutRates.csv")->mutrates
 OverviewDFilter$TSmutrate<-0
 OverviewDFilter$TSmutrate[OverviewDFilter$WTnt=="a"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="AG"]
 OverviewDFilter$TSmutrate[OverviewDFilter$WTnt=="c"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="CU"]
@@ -101,9 +103,9 @@ for (i in 1:984){
     if (OverviewDFilter$TypeOfSite[i]=="overlap") OverviewDFilter$color[i] = "grey"
 }
 
-write.csv(OverviewDFilter,"../Output/OverviewSelCoeff_BachelerFilter.csv")
+write.csv(OverviewDFilter,"./Output/OverviewSelCoeff_BachelerFilter.csv")
 
 for (i in OverviewDFilter$num){
-    OverviewDFilter$FracFiltered[i]<-length(which(Nonconsensusday0_pat_pos[,2]==i))
+#    OverviewDFilter$FracFiltered[i]<-length(which(Nonconsensusday0_pat_pos[,2]==i))
 }
 plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)
