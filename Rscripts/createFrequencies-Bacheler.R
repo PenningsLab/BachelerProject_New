@@ -1,6 +1,7 @@
 #This R script reads the Bacheler et al fasta files and creates a csv file that has frequencies for each patient and each site for the transition mutations. 
 # We filter the data before writing the file. 
 
+change 
 #new addition
 #1. only take patients with a consensus sequence at Day0
 #2. only consider changed nucleotides when the two other nucleotides in a codon are not mutated
