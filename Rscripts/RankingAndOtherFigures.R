@@ -12,14 +12,15 @@ library(scales)
 library(plotrix)
 library(RColorBrewer)
 
-read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
-read.csv("../Output/OverviewSelCoeff_Bacheler.csv")->OverviewDF
+#PSP Aug 2017 changed the names of the files read so that it includes the threshhold / filter
+read.table("../Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
 
 OverviewDFOrderedByFreq <- OverviewDF[order(OverviewDF$MeanFreq),] 
 PROdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num<298,]
 
 #Make a figure with all single site frequency spectra for Protease (and then RT)
-
+if (FALSE){
 pdf("../Output/SingleSiteFrequencySpectraPRO.pdf",width=8,height=10)
 par(mfrow=c(3,3))
 for (i in 1:297){
@@ -41,10 +42,10 @@ for (i in 1:297){
         points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
     }else{axis(2,labels = 60,at=60,las=1)}
 }
-dev.off()
-
+dev.off()}
 
 #Make a figure with all single site frequency spectra for RT
+if (FALSE){
 pdf("../Output/SingleSiteFrequencySpectraRT.pdf",width=8,height=10)
 par(mfrow=c(3,3))
 for (i in 298:length(OverviewDFOrderedByFreq$color)){
@@ -65,15 +66,15 @@ for (i in 298:length(OverviewDFOrderedByFreq$color)){
         points(c(0.01,0.02),c(60,60),pch=15,cex=2.5,col="white")
     }else{axis(2,labels = 60,at=60,las=1)}
 }
-dev.off()
+dev.off()}
 
 
 #PRO: Make the plots (transitions) for ranking
-
-pdf("../Output/ProteaseRanking.pdf",width = 13, height = 10)
-PROdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num<298,]
+pdf("../Output/ProteaseRanking_Aug2017.pdf",width = 13, height = 10)
+par(mfrow=c(1,1))
+PROdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num<298 & OverviewDFOrderedByFreq$TypeOfSite %in%c("nonsyn","stop","syn") ,]
 #remove resistance mutations
-PROdata<-PROdata[PROdata$TypeOfSite!="res",]
+#PROdata<-PROdata[PROdata$TypeOfSite!="res",]
 #remove positions with too many non-consensus patients
 #which(NumPats66Excluded>0.1)->listSitesToExclude
 #PROdata<-PROdata[-which(PROdata$num %in% listSitesToExclude),]
@@ -81,12 +82,21 @@ plot(log(PROdata$MeanFreq+0.001), main = "Protease mutant frequencies",
      ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(PROdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
 points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
-axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
+#axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
 dev.off()
 
 
-#Show the effect of our filtering out non-consensus patients at day 0
+pdf("../Output/PolRanking_Aug2017.pdf",width = 13, height = 10)
+par(mfrow=c(1,1))
+POLdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$TypeOfSite %in%c("nonsyn","stop","syn") ,]
+plot(log(POLdata$MeanFreq+0.001), main = "Protease mutant frequencies",
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(POLdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
+dev.off()
 
+
+
+#Show the effect of our filtering out non-consensus patients at day 0
 #PSP: continue here! 
 
 pdf("../Output/ProteaseRanking_EffectFiltering.pdf",width = 13, height = 10)
