@@ -68,8 +68,9 @@ for (i in 298:length(OverviewDFOrderedByFreq$color)){
 }
 dev.off()}
 
-
+#All of the rest of this file is now replaced by "ranking_Ordered_Figure1.R"
 #PRO: Make the plots (transitions) for ranking
+if (FALSE){
 pdf("../Output/ProteaseRanking_Aug2017.pdf",width = 13, height = 10)
 par(mfrow=c(1,1))
 PROdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$num<298 & OverviewDFOrderedByFreq$TypeOfSite %in%c("nonsyn","stop","syn") ,]
@@ -85,14 +86,24 @@ points(10*PROdata$NumPats66Excluded+log(0.001),pch=16,cex=0.5,col="grey")
 #axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
 dev.off()
 
+#make figure with ranked / ordered frequencies with all data
 
-pdf("../Output/PolRanking_Aug2017.pdf",width = 13, height = 10)
+plot(5, type = "n", log = "y", axes = FALSE, xlim = c(0, length(toPlot[!is.na(toPlot)])), 
+     ylim = c(10^-(wheresthebreak), max(toPlot, na.rm = TRUE)),  
+     ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", 
+     cex.lab = 1.5)
+
+
+#pdf("../Output/PolRanking_Aug2017.pdf",width = 13, height = 10)
 par(mfrow=c(1,1))
 POLdata<-OverviewDFOrderedByFreq[OverviewDFOrderedByFreq$TypeOfSite %in%c("nonsyn","stop","syn") ,]
 plot(log(POLdata$MeanFreq+0.001), main = "Protease mutant frequencies",
-     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(POLdata$color, 1), xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" , yaxt = "n")
+     ylim=c(log(0.001),log(0.5)),cex=1.5, pch = 16, col=alpha(POLdata$color, 1), 
+#     xlab = "Nucleotides ordered by mean mutation frequency", ylab = "Mean mutation frequency" ,
+     ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", 
+     yaxt = "n")
 axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.051, 0.101)),las=1)
-dev.off()
+#dev.off()
 
 
 
@@ -136,5 +147,5 @@ axis(2,labels = c(0,0.001, 0.005, 0.05, 0.1), at = log(c(0.001, 0.002, 0.006, 0.
 #axis(4,labels = c(0,0.05,0.1), at = 10*c(0,0.05,0.1)+log(0.001),las=1)
 points(log(RTdata$colMeansTs66[order(RTdata$colMeansTs66)]+0.001),cex=1.5, pch = 16, col=alpha(RTdata$color, 0.3))
 dev.off()
-
+}
 
