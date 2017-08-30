@@ -65,7 +65,7 @@ plotter <- function(datset){
 
 #for(dat.file in c("Lehman", "Zanini", "Bachelor")){
 for(dat.file in c("Bachelor")){
-        pdf(paste("F1-ordered-Aug2017", dat.file, "-v3.pdf", sep = ""), height = 5, width = 8)
+        pdf(paste("../Output/F1-ordered-Aug2017", dat.file, "-v3.pdf", sep = ""), height = 5, width = 8)
     plotter(dat.file)
     dev.off()
 }

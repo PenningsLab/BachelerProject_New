@@ -12,16 +12,17 @@
 #* Perform necessary calcuations
 #* Plot results (eventually new script)
 
+#Prep data
+if (FALSE){
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
 library(plotrix)
 library(RColorBrewer)
-
 #July 2017 now read freqPatTs_Bacheler_Threshold05.csv  and OverviewSelCoeff_BachelerFilter.csv
 read.table("../Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
 read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
-
+}
 #Test whether non syn muts, syn muts and nonsense muts are different in freq
 
 FreqsSyn<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="syn"]
@@ -31,10 +32,61 @@ FreqsStop<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="stop"]
 wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
 wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 
+#Make a figure with the selection coefficients across Pol
+if (TRUE){
+#pdf("../Output/EstSelCoeffPRO_aug2017.pdf",width=12,height=8)
+png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=8,units="in",res=100)
+    par(mfrow=c(1,1))
+#make log scale
+maxnuc=984
+plot(OverviewDF$num[40:maxnuc],OverviewDF$EstSelCoeff[40:maxnuc],
+     log="y", ylab="Estimated Selection Coefficient (cost)", 
+     xlab = "Position in Protease                                                                                 Position in RT                                                             ", 
+     xaxt="n",yaxt="n", 
+     col="darkgrey",t="n",pch=".", ylim=c(5*10^-4,1))
+axis(1,at=c(3*seq(15,95,by=20)-1,296+30),labels=c(seq(15,95,by=20),""))
+axis(1,at=3*seq(109,349,by=20)-1,labels=seq(109-99,349-99,by=20))
+axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
+abline(v=297.5,lwd=4,col="grey61")
+
+for(i in 1:5){
+    abline(h = 1:10 * 10^(-i), col = "gray61")
+}
+
+cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
+for (i in 40:maxnuc){
+    c=0
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("c","g")) c=cols[1]
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) c=cols[1]
+    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("c","g")) c=cols[2]
+    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) c=cols[4]
+   if (c!=0) points(OverviewDF$num[i],OverviewDF$EstSelCoeff[i],pch=21,col=1,
+                     bg=rgb(red=col2rgb(c)[1]/255,
+                           green=col2rgb(c)[2]/255,
+                           blue=col2rgb(c)[3]/255,
+                           maxColorValue = 1,alpha=0.8),
+   cex=2)
+}
+
+
+rect(270*3, 0.0004, 315*3, 0.0013, density = NULL, angle = 45,col="white")
+
+#legend
+points(275*3,0.001,pch=21,bg=cols[2],col=1,cex=2)
+text(295*3,0.001,"non-syn, C/G")
+points(275*3,0.001*0.7,pch=21,bg=cols[4],col=1,cex=2)
+text(295*3,0.001*0.7,"non-syn, A/T")
+points(275*3,0.001*0.5,pch=21,bg=cols[1],col=1,cex=2)
+text(290*3,0.001*0.5,"syn")
+
+dev.off()
+}
+
+
 #Make a figure with the selection coefficients across Protease
 
 if(FALSE){
-pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
+#pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
 par(mfrow=c(1,1))
 #make log scale
 plot(OverviewDF$num[40:297],OverviewDF$EstSelCoeff[40:297],
@@ -47,7 +99,9 @@ axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-
 
 #A #SYN #no CPG
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0&OverviewDF$num<=297,]
-points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])
+
+points(data$num,data$EstSelCoeff,
+       pch=21,bg=brewer.pal(11, "Spectral")[11])
 a=1:length(data$num)
 #PSP 2017 June use this to add conf intervals
 #arrows(x0=data$num[a],y0=data$TSmutrate[a]/data$lowerConf[a],
@@ -59,15 +113,19 @@ points(45,2*10^-5,pch=21,bg=brewer.pal(11, "Spectral")[11])
 text(48,2*10^-5,pos=4,"A/T/C, syn, no CpG")
 
 #T #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="t"&OverviewDF$makesCpG==0&OverviewDF$num<=297],
+       pch=21,bg=brewer.pal(11, "Spectral")[11])
 
 #C #SYN #no CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],pch=21,bg=brewer.pal(11, "Spectral")[11])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0&OverviewDF$num<=297],
+       pch=21,bg=brewer.pal(11, "Spectral")[11])
 
 #A #SYN #CPG
-points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],pch=24,bg=brewer.pal(11, "Spectral")[10])
+points(OverviewDF$num[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==1&OverviewDF$num<=297],
+       pch=24,bg=brewer.pal(11, "Spectral")[10])
 
-points(45,1.4*10^-5,pch=24,bg=brewer.pal(11, "Spectral")[10])
+points(45,1.4*10^-5,pch=24,
+       bg=brewer.pal(11, "Spectral")[10])
 text(48,1.4*10^-5,pos=4,"A/T, syn, CpG")
 
 #T #SYN #CPG
@@ -150,7 +208,7 @@ points(OverviewDF$num[OverviewDF$TypeOfSite=="res"&OverviewDF$num<=297],Overview
 points(280,1.4*10^-5,pch=8,bg=1,col=1)
 text(283,1.4*10^-5,pos=4,"resistance")
 
-dev.off()
+#dev.off()
 }
 
 #Make a figure with the selection coefficients across RT
@@ -268,7 +326,7 @@ dev.off()
 }
 
 #Make a figure with single site frequency spectra for Protease AA 58
-
+if (FALSE){
 pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
 zerobar=50
 cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
@@ -368,3 +426,4 @@ for (i in 172:174){
 }
 
 dev.off()
+}
