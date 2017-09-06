@@ -35,23 +35,22 @@ wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 #Make a figure with the selection coefficients across Pol
 if (TRUE){
 #pdf("../Output/EstSelCoeffPRO_aug2017.pdf",width=12,height=8)
-png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=8,units="in",res=100)
+png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
     par(mfrow=c(1,1))
-#make log scale
 maxnuc=984
+par(mar = c(3,5,1,2))
 plot(OverviewDF$num[40:maxnuc],OverviewDF$EstSelCoeff[40:maxnuc],
      log="y", ylab="Estimated Selection Coefficient (cost)", 
-     xlab = "Position in Protease                                                                                 Position in RT                                                             ", 
-     xaxt="n",yaxt="n", 
-     col="darkgrey",t="n",pch=".", ylim=c(5*10^-4,1))
+     xaxt="n",yaxt="n", xlab="",
+     col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,975))
 axis(1,at=c(3*seq(15,95,by=20)-1,296+30),labels=c(seq(15,95,by=20),""))
 axis(1,at=3*seq(109,349,by=20)-1,labels=seq(109-99,349-99,by=20))
-axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0))
-abline(v=297.5,lwd=4,col="grey61")
+axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0)
+#abline(v=297.5,lwd=4,col="grey61")
 
-for(i in 1:5){
-    abline(h = 1:10 * 10^(-i), col = "gray61")
-}
+#color Protease region grey
+rect(0, 0.00001, 297.5, 2, density = NULL, angle = 45,col="grey70",border = NA)
+for(i in 1:5){abline(h = 1:10 * 10^(-i), col = "gray41")}
 
 cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
 for (i in 40:maxnuc){
@@ -69,25 +68,29 @@ for (i in 40:maxnuc){
    cex=2)
 }
 
+#Add "Protease" and "RT" words
+rect(0, 0.000001, 1200, 3.5*10^-4, density = NULL, angle = 45,col=1,border = NA)
+text(55*3,2.9*10^-4,"PROTEASE",col="white")
+rect(297.5, 0.000001, 1200, 3.5*10^-4, density = NULL, angle = 45,col="grey40",border = NA)
+text(220*3,2.9*10^-4,"REVERSE TRANSCRIPTASE",col="white")
 
-rect(270*3, 0.0004, 315*3, 0.0017, density = NULL, angle = 45,col=alpha("white",0.5))
-
-#legend
-points(275*3,0.001/0.7,pch=21,bg=1,col=1,cex=2)
-text(290*3,0.001/0.7,"nonsense")
-points(275*3,0.001,pch=21,bg=cols[2],col=1,cex=2)
-text(295*3,0.001,"non-syn, C/G")
-points(275*3,0.001*0.7,pch=21,bg=cols[4],col=1,cex=2)
-text(295*3,0.001*0.7,"non-syn, A/T")
-points(275*3,0.001*0.5,pch=21,bg=cols[1],col=1,cex=2)
-text(295*3,0.001*0.5,"synonymous")
+#Add legend
+legpos=296;legposV=0.4
+rect(legpos*3, 0.4*legposV, (legpos+41)*3, 1.7*legposV, density = NULL, angle = 45,col=alpha("white",1))
+points((legpos+5)*3,legposV/0.7,pch=21,bg=1,col=1,cex=2)
+text((legpos+9)*3,legposV/0.7,"nonsense",adj=0)
+points((legpos+5)*3,legposV,pch=21,bg=cols[2],col=1,cex=2)
+text((legpos+9)*3,legposV,"non-syn, C/G",adj=0)
+points((legpos+5)*3,legposV*0.7,pch=21,bg=cols[4],col=1,cex=2)
+text((legpos+9)*3,legposV*0.7,"non-syn, A/T",adj=0)
+points((legpos+5)*3,legposV*0.49,pch=21,bg=cols[1],col=1,cex=2)
+text((legpos+9)*3,legposV*0.49,"synonymous",adj=0)
 
 dev.off()
 }
 
 
 #Make a figure with the selection coefficients across Protease
-
 if(FALSE){
 #pdf("../Output/EstSelCoeffPRO.pdf",width=12,height=8)
 par(mfrow=c(1,1))
