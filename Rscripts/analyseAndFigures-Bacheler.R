@@ -13,7 +13,7 @@
 #* Plot results (eventually new script)
 
 #Prep data
-if (FALSE){
+if (TRUE){
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(scales)
@@ -56,11 +56,12 @@ for(i in 1:5){
 cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
 for (i in 40:maxnuc){
     c=0
-    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("c","g")) c=cols[1]
-    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) c=cols[1]
-    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("c","g")) c=cols[2]
-    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) c=cols[4]
-   if (c!=0) points(OverviewDF$num[i],OverviewDF$EstSelCoeff[i],pch=21,col=1,
+    if (OverviewDF$TypeOfSite[i]=="stop"&OverviewDF$WTnt[i]%in%c("g","c")) {c=1;p=21}
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("g","c")) {c=cols[1];p=21}
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[1];p=21}
+    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("c","g")) {c=cols[2];p=21}
+    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[4];p=21}
+    if (c!=0) points(OverviewDF$num[i],OverviewDF$EstSelCoeff[i],pch=p,col=1,
                      bg=rgb(red=col2rgb(c)[1]/255,
                            green=col2rgb(c)[2]/255,
                            blue=col2rgb(c)[3]/255,
@@ -69,15 +70,17 @@ for (i in 40:maxnuc){
 }
 
 
-rect(270*3, 0.0004, 315*3, 0.0013, density = NULL, angle = 45,col="white")
+rect(270*3, 0.0004, 315*3, 0.0017, density = NULL, angle = 45,col=alpha("white",0.5))
 
 #legend
+points(275*3,0.001/0.7,pch=21,bg=1,col=1,cex=2)
+text(290*3,0.001/0.7,"nonsense")
 points(275*3,0.001,pch=21,bg=cols[2],col=1,cex=2)
 text(295*3,0.001,"non-syn, C/G")
 points(275*3,0.001*0.7,pch=21,bg=cols[4],col=1,cex=2)
 text(295*3,0.001*0.7,"non-syn, A/T")
 points(275*3,0.001*0.5,pch=21,bg=cols[1],col=1,cex=2)
-text(290*3,0.001*0.5,"syn")
+text(295*3,0.001*0.5,"synonymous")
 
 dev.off()
 }
@@ -326,25 +329,28 @@ dev.off()
 }
 
 #Make a figure with single site frequency spectra for Protease AA 58
-if (FALSE){
+if (TRUE){
 pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
-zerobar=50
+zerobar=50; h2=22; x1=0.25
 cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
 par(mfrow=c(2,3))
+par(mar = c(1,3,4,2))
 for (i in 172:174){
     #first create empty plot with title
     if (i == 172){
         #par(fig=c(0,2/3,0,1))
-        t=paste("C172T \n nonsense mutation",sep="")
+        t=paste("nonsense mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[1],border=0,
              #    main= bquote(paste(.(t),(C %->% T ))), cex=1.3,
              main="",cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
         title(t,cex=1.2,line=0)
+        text(x1,30,"observed data",cex=1.3)
+        text(x1,h2,"(C172T)",cex=1.3)
     }
     if (i == 173){
-        t=paste("A173G \n non-synonymous mutation",sep="")
+        t=paste("         non-synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n non-synonymous mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[2],border=0,
@@ -352,9 +358,12 @@ for (i in 172:174){
              main= "", cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
         title(t,cex=1.2,line=0)
+        text(x1,30,"observed data",cex=1.3)
+        text(x1,h2,"(A173G)",cex=1.3)
+        
     }
     if (i == 174){
-        t=paste("G174A \n synonymous mutation",sep="")
+        t=paste("   synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n synonymous mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=cols[3],border=0,
@@ -362,6 +371,9 @@ for (i in 172:174){
              main= "", cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
         title(t,cex=1.2,line=0)
+        text(x1,30,"observed data",cex=1.3)
+        text(x1,h2,"(G174A)",cex=1.3)
+        
     }
     #Next, show  0 bar
     if (i == 172){
@@ -398,6 +410,7 @@ for (i in 172:174){
 }
 #next, show simulated frequencies
 #    par(fig=c(2/3,1,0,1), new = TRUE)
+par(mar = c(4.5,3,1,2))
 for (i in 172:174){
     if (i ==172)Freqs<-read.csv("../Output/SimFreqs172.csv",row.names=1)[1][,1]
     if (i ==173)Freqs<-read.csv("../Output/SimFreqs173.csv",row.names=1)[1][,1]
@@ -407,16 +420,20 @@ for (i in 172:174){
          col=cols[1],border=0,
          main="",cex=1.2,
          xlab="Frequency", ylab="Count",cex.lab=1.4)
-    title(t,cex=1.2,line=0)
+    #title(t,cex=1.2,line=0)
+    text(x1,30,"simulated data",cex=1.3)
+    if (i ==172)text(x1,h2,"(s=1)",cex=1.3)
+    if (i ==173)text(x1,h2,paste("(s=",round(OverviewDF$EstSelCoeff[173],3),")",sep=""),cex=1.3)
+    if (i ==174)text(x1,h2,paste("(s=",round(OverviewDF$EstSelCoeff[174],3),")",sep=""),cex=1.3)
     
     hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
-         yaxt="n",col="pink",add=T)
+         yaxt="n",col=brewer.pal(4, "Set2")[4],add=T)
     hist(c(rep(0,
                min(zerobar,length(which(Freqs<0.02)))
                ),
            Freqs[which(Freqs>=0.02)]),
          breaks=seq(0,1,by=0.02),add=T,
-        col="pink")
+        col=brewer.pal(4, "Set2")[4])
     axis(2,labels = c(10,20,30,max(zerobar,length(which(Freqs<0.02)))), 
      at = c(10,20,30,zerobar), las=1)
     if (length(which(Freqs<0.02))>=zerobar){
