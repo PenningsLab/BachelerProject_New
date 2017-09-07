@@ -41,11 +41,11 @@ plotter <- function(datset){
     colVect[dataset$TypeOfSite == "nonsyn"] <- cols[2]
     colVect[dataset$TypeOfSite == "syn"] <- cols[1]
     colVect[dataset$TypeOfSite == "stop"] <- "black"
-    plot(5, type = "n", log = "y", axes = FALSE, xlim = c(0, length(toPlot[!is.na(toPlot)])), ylim = c(10^-(wheresthebreak), max(toPlot, na.rm = TRUE)),  ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", cex.lab = 1.5)
+    plot(5, type = "n", log = "y", axes = FALSE, xlim = c(0, length(toPlot[!is.na(toPlot)])), ylim = c(10^-(wheresthebreak), max(toPlot, na.rm = TRUE)),  ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", cex.lab = 1.3)
     for(i in 1:wheresthebreak){
-        abline(h = 1:10 * 10^(-i), col = "gray90")
+        abline(h = 1:10 * 10^(-i), col = "gray70")
     }
-    abline(h = 10^-(wheresthebreak), col = "gray90")
+    abline(h = 10^-(wheresthebreak), col = "gray70")
     if(remap == 1){
         eaxis(side = 2, at = 10^((-1):(-(wheresthebreak-1))))
         axis(side = 2, at = c(1, 10^-(wheresthebreak)), label = c(1, 0), las = 2)
@@ -65,7 +65,8 @@ plotter <- function(datset){
 
 #for(dat.file in c("Lehman", "Zanini", "Bachelor")){
 for(dat.file in c("Bachelor")){
-        pdf(paste("../Output/F1-ordered-Aug2017", dat.file, "-v3.pdf", sep = ""), height = 5, width = 8)
+    png(paste("../Output/F1-ordered-Aug2017", dat.file, "-v3.png", sep = ""), height = 6, width = 9,units="in",res=100)
+    #png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
     plotter(dat.file)
     dev.off()
 }

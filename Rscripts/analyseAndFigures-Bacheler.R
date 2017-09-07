@@ -40,13 +40,13 @@ png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=10
 maxnuc=984
 par(mar = c(3,5,1,2))
 plot(OverviewDF$num[40:maxnuc],OverviewDF$EstSelCoeff[40:maxnuc],
-     log="y", ylab="Estimated Selection Coefficient (cost)", 
+     log="y", ylab="Estimated Selection Coefficient (cost)",cex.lab=1.3,
      xaxt="n",yaxt="n", xlab="",
-     col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,975))
+     col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,979))
 axis(1,at=c(3*seq(15,95,by=20)-1,296+30),labels=c(seq(15,95,by=20),""))
 axis(1,at=3*seq(109,349,by=20)-1,labels=seq(109-99,349-99,by=20))
-axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0)
-#abline(v=297.5,lwd=4,col="grey61")
+axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0,tick=FALSE)
+eaxis(side = 2, at = 10^((-0):(-(5))),label=rep("",6))
 
 #color Protease region grey
 rect(0, 0.00001, 297.5, 2, density = NULL, angle = 45,col="grey70",border = NA)
@@ -76,15 +76,15 @@ text(220*3,2.9*10^-4,"REVERSE TRANSCRIPTASE",col="white")
 
 #Add legend
 legpos=296;legposV=0.4
-rect(legpos*3, 0.4*legposV, (legpos+41)*3, 1.7*legposV, density = NULL, angle = 45,col=alpha("white",1))
+rect(legpos*3, 0.4*legposV, (legpos+42.5)*3, 1.7*legposV, density = NULL, angle = 45,col=alpha("white",1))
 points((legpos+5)*3,legposV/0.7,pch=21,bg=1,col=1,cex=2)
-text((legpos+9)*3,legposV/0.7,"nonsense",adj=0)
+text((legpos+9)*3,legposV/0.7,"Nonsense",adj=0)
 points((legpos+5)*3,legposV,pch=21,bg=cols[2],col=1,cex=2)
-text((legpos+9)*3,legposV,"non-syn, C/G",adj=0)
+text((legpos+9)*3,legposV,"Non-syn, C/G",adj=0)
 points((legpos+5)*3,legposV*0.7,pch=21,bg=cols[4],col=1,cex=2)
-text((legpos+9)*3,legposV*0.7,"non-syn, A/T",adj=0)
+text((legpos+9)*3,legposV*0.7,"Non-syn, A/T",adj=0)
 points((legpos+5)*3,legposV*0.49,pch=21,bg=cols[1],col=1,cex=2)
-text((legpos+9)*3,legposV*0.49,"synonymous",adj=0)
+text((legpos+9)*3,legposV*0.49,"Synonymous",adj=0)
 
 dev.off()
 }
@@ -430,13 +430,13 @@ for (i in 172:174){
     if (i ==174)text(x1,h2,paste("(s=",round(OverviewDF$EstSelCoeff[174],3),")",sep=""),cex=1.3)
     
     hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
-         yaxt="n",col=brewer.pal(4, "Set2")[4],add=T)
+         yaxt="n",col=brewer.pal(4, "Set2")[3],add=T)
     hist(c(rep(0,
                min(zerobar,length(which(Freqs<0.02)))
                ),
            Freqs[which(Freqs>=0.02)]),
          breaks=seq(0,1,by=0.02),add=T,
-        col=brewer.pal(4, "Set2")[4])
+        col=brewer.pal(4, "Set2")[3])
     axis(2,labels = c(10,20,30,max(zerobar,length(which(Freqs<0.02)))), 
      at = c(10,20,30,zerobar), las=1)
     if (length(which(Freqs<0.02))>=zerobar){
