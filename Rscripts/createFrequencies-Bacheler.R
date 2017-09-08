@@ -104,10 +104,6 @@ print("how much data discarded because of filtering?")
 print(length(Nonconsensusday0_pat_pos[,1])/(length(freqPatTs_threshold[,1])*length(freqPatTs_threshold[1,])))
 }
 
-
-
-
-
 plot(OverviewDFilter$MeanFreq,table(Nonconsensusday0_pat_pos[,1]))
 
 for (i in OverviewDFilter$num){
