@@ -33,7 +33,7 @@ wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
 wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 
 #Make a figure with the selection coefficients across Pol
-if (TRUE){
+if (FALSE){
 #pdf("../Output/EstSelCoeffPRO_aug2017.pdf",width=12,height=8)
 png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
     par(mfrow=c(1,1))
@@ -88,7 +88,6 @@ text((legpos+9)*3,legposV*0.49,"Synonymous",adj=0)
 
 dev.off()
 }
-
 
 #Make a figure with the selection coefficients across Protease
 if(FALSE){
@@ -332,7 +331,7 @@ dev.off()
 }
 
 #Make a figure with single site frequency spectra for Protease AA 58
-if (TRUE){
+if (FALSE){
 pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
 zerobar=50; h2=22; x1=0.25
 cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
