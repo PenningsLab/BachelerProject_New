@@ -3,6 +3,9 @@ PR.txt
 RT.txt
 datFitModel.csv
 GLM_Analysis/dat/datFitModel.csv
+CountDataLehmanRT.csv
+BachelerCountData_Threshold05.csv
+BachelerCountData_filter.csv
 
 #History files
 .Rhistory
