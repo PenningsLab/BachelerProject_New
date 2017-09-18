@@ -49,16 +49,16 @@ makeDataFrameToModify.withSHAPEandinRT <- function(nsOrNo = 0, CpGorNo = 0, bigA
 
 DataFrameOfData <- function(){
     
-    ret.mat <- as.data.frame(matrix(data = 0, ncol = nrow(modcoef), nrow = nrow(suppDatShape)))
+    ret.mat <- as.data.frame(matrix(data = 0, ncol = nrow(modcoef), nrow = nrow(PolShapeData)))
     ret.mat[,1] <- 1
-    ret.mat[,2] <- as.numeric(suppDat$WTnt == "t")
-    ret.mat[,3] <- as.numeric(suppDat$WTnt == "c")
-    ret.mat[,4] <- as.numeric(suppDat$WTnt == "g")
+    ret.mat[,2] <- as.numeric(OverviewDF$WTnt == "t")
+    ret.mat[,3] <- as.numeric(OverviewDF$WTnt == "c")
+    ret.mat[,4] <- as.numeric(OverviewDF$WTnt == "g")
     ret.mat[,5] <- bigChange
     ret.mat[,6] <- 0
     ret.mat[1:297,6] <- 1
-    ret.mat[,7] <- as.numeric(suppDat$TypeOfSite == "nonsyn")
-    ret.mat[,8] <- suppDatShape$SHAPE
+    ret.mat[,7] <- as.numeric(OverviewDF$TypeOfSite == "nonsyn")
+    ret.mat[,8] <- PolShapeData$SHAPE
     ret.mat[,9] <- makesCpG
     ret.mat[,10] <- ret.mat[,2] * ret.mat[,7]
     ret.mat[,11] <- ret.mat[,3] * ret.mat[,7]

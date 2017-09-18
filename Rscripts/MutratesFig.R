@@ -5,9 +5,10 @@ setwd("~/Documents/Git/bachelerProject")
 #Mut rates and sel coefficients
 read.csv("Data/HIVMutRates/HIVMutRates.csv")->mutrates
 
-included<-which(mutrates$Nucleotide.substitution%in%c("AG","CU","GA","UC"))
-#reorder included
-included<-c(12,2,5,15)
+included<-c(which(mutrates$Nucleotide.substitution=="AG"),
+            which(mutrates$Nucleotide.substitution=="UC"),
+            which(mutrates$Nucleotide.substitution=="CU"),
+            which(mutrates$Nucleotide.substitution=="GA"))
 pdf("Output/MutationRatesUsed.pdf")
 par(mar = c(4.5, 6, 4, 0.5))
 barplot(t(as.matrix(mutrates[included,2:3])),beside=TRUE,ylim=c(0,6*10^-5),
