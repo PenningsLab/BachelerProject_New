@@ -46,8 +46,17 @@ OverviewDFilter$TSmutrate[OverviewDFilter$WTnt=="c"]<-mutrates$Probability[mutra
 OverviewDFilter$TSmutrate[OverviewDFilter$WTnt=="g"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="GA"]
 OverviewDFilter$TSmutrate[OverviewDFilter$WTnt=="t"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="UC"]
 
+#Add mutrates from Zanini paper
+OverviewDFilter$TSmutZan<-0
+OverviewDFilter$TSmutZan[OverviewDFilter$WTnt=="a"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="AG"]
+OverviewDFilter$TSmutZan[OverviewDFilter$WTnt=="c"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="CU"]
+OverviewDFilter$TSmutZan[OverviewDFilter$WTnt=="g"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="GA"]
+OverviewDFilter$TSmutZan[OverviewDFilter$WTnt=="t"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="UC"]
+
+
 for (i in 1:984){
     OverviewDFilter$EstSelCoeff[i] = EstimatedS(OverviewDFilter$TSmutrate[i],OverviewDFilter$MeanFreq[i])
+    OverviewDFilter$EstSelCoeffZan[i] = EstimatedS(OverviewDFilter$TSmutZan[i],OverviewDFilter$MeanFreq[i])
 }
 
 #WT AAs 
@@ -105,7 +114,4 @@ for (i in 1:984){
 
 write.csv(OverviewDFilter,"./Output/OverviewSelCoeff_BachelerFilter.csv")
 
-for (i in OverviewDFilter$num){
-#    OverviewDFilter$FracFiltered[i]<-length(which(Nonconsensusday0_pat_pos[,2]==i))
-}
-plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)
+#plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)
