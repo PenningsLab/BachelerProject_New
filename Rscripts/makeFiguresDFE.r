@@ -1,8 +1,9 @@
 #actually, currently figure 2
 
-Bach.dat <- read.table("../dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Lehman.dat <- read.table("../dat/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Zanini.dat <- read.table("../dat/OverviewSelCoeffZanini-v2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+Bach.dat<-read.csv("Output/OverviewSelCoeff_BachelerFilter.csv")
+#Bach.dat <- read.table("Output/Over", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+#Lehman.dat <- read.table("../Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+#Zanini.dat <- read.table("../Output/OverviewSelCoeffZanini-v2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 
 library(plotrix)
@@ -33,7 +34,7 @@ plotter <- function(datset, typematch){
             xlim.set = c(0, 1)
             splitPlot = 1 
         }else{
-            xlim.set = c(0, .05)
+            xlim.set = c(0, .5)
         }
     }
 
@@ -86,9 +87,10 @@ plotter <- function(datset, typematch){
 
 
 
-for(dat.file in c("Lehman", "Zanini", "Bacheler")){
+#for(dat.file in c("Lehman", "Zanini", "Bacheler")){
+for(dat.file in c("Bacheler")){
     for(sitetype in c("nonsyn", "syn")){
-        pdf(paste("../out/F2-", dat.file, "-", sitetype, ".pdf", sep = ""), height = 8, width = 8)
+        pdf(paste("Output/F2-SEP2017", dat.file, "-", sitetype, ".pdf", sep = ""), height = 8, width = 8)
         plotter(dat.file, sitetype)
         dev.off()
     }
@@ -96,8 +98,9 @@ for(dat.file in c("Lehman", "Zanini", "Bacheler")){
 
 
 #Enter the Zanini mutation rates
-zanMut <- rep(0, nrow(suppDat))
-zanMut[suppDat$WTnt == "a"] <- 5.4*10^(-6)
-zanMut[suppDat$WTnt == "t"] <- 8*10^(-6)
-zanMut[suppDat$WTnt == "c"] <- 1.1*10^(-5)
-zanMut[suppDat$WTnt == "g"] <- 1.5*10^(-5)
+#PSP Sept 2017 if we need those mut rates, they are in ("Data/HIVMutRates/HIVMutRates.csv")
+#zanMut <- rep(0, nrow(suppDat))
+#zanMut[suppDat$WTnt == "a"] <- 5.4*10^(-6)
+#zanMut[suppDat$WTnt == "t"] <- 8*10^(-6)
+#zanMut[suppDat$WTnt == "c"] <- 1.1*10^(-5)
+#zanMut[suppDat$WTnt == "g"] <- 1.5*10^(-5)
