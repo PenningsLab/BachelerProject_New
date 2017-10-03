@@ -1,4 +1,4 @@
-#makes figure
+#makes figure about mutation rates
 
 setwd("~/Documents/Git/bachelerProject")
 
