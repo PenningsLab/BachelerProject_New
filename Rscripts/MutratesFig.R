@@ -1,4 +1,4 @@
-
+#makes figure
 
 setwd("~/Documents/Git/bachelerProject")
 
