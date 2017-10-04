@@ -1,14 +1,15 @@
+#add a comment here to show ryan
 setwd("~/Documents/Git/bachelerProject/Rscripts/")
 
-source("prepareDataForGLM.R")
+if (FALSE) source("prepareDataForGLM.R")
 source("helperFunctionsForF2.R")
 
 #Substantially more complicated model with structural elements
 #fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t + helix*nonsyn + beta*nonsyn + coil*nonsyn,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
 
-#Run model 
-fullmodel.int <- glm(minor ~ inRT + shape + t + c + g + CpG + CpG*t  + t*nonsyn + c*nonsyn + g*nonsyn + nonsyn*CpG + t:nonsyn:CpG + bigAAChange,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
-sumOfModel <- summary(fullmodel.int)
+#Run model  
+if (FALSE) fullmodel.int <- glm(minor ~ inRT + shape + t + c + g + CpG + CpG*t  + t*nonsyn + c*nonsyn + g*nonsyn + nonsyn*CpG + t:nonsyn:CpG + bigAAChange,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
+if (FALSE) sumOfModel <- summary(fullmodel.int)
 
 #Create a table for latex 
 require(xtable)
@@ -58,8 +59,10 @@ included<-c(which(mutrates$Nucleotide.substitution=="AG"),
   which(mutrates$Nucleotide.substitution=="CU"),
   which(mutrates$Nucleotide.substitution=="GA"))
 
-mus<-mutrates$Probability[included]
-#mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
+for (MutRates in c("Abram","Zan")){
+    if (MutRates == "Abram") mus<-mutrates$Probability[included] #This reads the Abram mut rates
+    if (MutRates == "Zan") mus<-mutrates$ZaniniProb[included] #This reads the Abram mut rates
+    #mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
 
 # Point 1:
 #synonymous CpG forming mutations
@@ -71,8 +74,10 @@ NonCpGSyn<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTva
 #Magnitude changes
 magchanges<-(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,1,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))/(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))
 
-cat(        "\n\nPOINT 1\n" ,file = "../Output/GLMResultsText.txt", append=FALSE,sep="\n")
+if (MutRates == "Abram") cat("MUTRATES FROM ABRAM 2010" ,file = "../Output/GLMResultsText.txt", append=FALSE,sep="\n")
+if (MutRates == "Zan") cat("MUTRATES FROM ZANINI 2017" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
+cat("\n\nPOINT 1\n" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are ",file = "../Output/GLMResultsText.txt", append=TRUE)
 cat(round(mean(magchanges[1:2])),file = "../Output/GLMResultsText.txt", append=TRUE)
@@ -144,7 +149,8 @@ NewCpG <- mus/exp(makeDataFrameToModify.withSHAPEandinRT(1,1,0, avShape, inRTval
 #Magnitude change
 NewCpG/noNewCpG
 
-cat(        "\n\nPOINT 4\n" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
+
+cat("\n\nPOINT 4\n" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("\nThere was also an effect of whether or not a non-synonymous mutation created a 
     CpG site ($p < 0.001$ for both A-G and T-C mutations). 
@@ -184,19 +190,22 @@ cat(round(noNewCpG[3],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep=
 cat(        "vs" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[1],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        ", and G-A mutations are " ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
-cat(round(noNewCpG[4]/noNewCpG[2],2),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
+#PSP I think this should be noNewCpG[1] instead of noNewCpG[2]
+cat(round(noNewCpG[4]/noNewCpG[1],2),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        "times more costly than A-G mutations" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[4],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(        "vs" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
-cat(round(noNewCpG[2],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
+cat(round(noNewCpG[1],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
 #PSP: continue here. 
 
 #Make plots
 library(plotrix)
 require(RColorBrewer)
-pdf("../Output/modeled_freqs_May2017_2.pdf", width = 12, height = 7)
-cols <- brewer.pal(4, "Set2")
+png("../Output/modeled_freqs_Sep2017_2.png",width=12,height=7.5,units="in",res=100)
+#if (MutRates == "Zan") png("../Output/EstSelCoeffZanPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
+#pdf("../Output/modeled_freqs_May2017_2.pdf", width = 12, height = 7)
+#cols <- brewer.pal(4, "Set2")
 layout(matrix(1:2, nrow = 1))
 par(mar = c(4, 4.5, 1.5, 1))
 makePlot.axisbreak(main = "Synonymous Sites")
@@ -219,31 +228,33 @@ plotVals(1, 1, 1, cols[4], .3 )
 abline(v = 1:3 + .5, col = "black")
 dev.off()
 
-pdf("../Output/modeled_sels_May2017.pdf", width = 12, height = 7)
-cols <- brewer.pal(4, "Set2")
+#pdf("../Output/modeled_sels_May2017.pdf", width = 12, height = 7)
+if (MutRates == "Abram") png("../Output/modeled_sels_AbramSEP2017.png",width=12,height=7.5,units="in",res=100)
+if (MutRates == "Zan") png("../Output/modeled_sels_ZanSEP2017.png",width=12,height=7.5,units="in",res=100)
+#cols <- brewer.pal(4, "Set2")
 layout(matrix(1:2, nrow = 1))
 par(mar = c(4, 4.5, 1.5, 1))
 makePlot.svals(main = "Synonymous Sites")
-plotVals.svals(0, 1, 0, cols[1], .1)
-plotVals.svals(0, 0, 0, cols[2], -.1)
-plotDat.svals(0, 1, 0, cols[1], .1)
-plotDat.svals(0, 0, 0, cols[2], -.1)
+plotVals.svals(0, 1, 0, cols[1], .1,mus)
+plotVals.svals(0, 0, 0, cols[2], -.1,mus)
+plotDat.svals(0, 1, 0, cols[1], .1,mus)
+plotDat.svals(0, 0, 0, cols[2], -.1,mus)
 abline(v = 1:3 + .5, col = "black")
 #legend("topleft", c("CpG-forming", "non-CpG-forming"), col = cols[1:2], pch = 16, bg = "white")
 legend("topleft", c("No drastic AA change (non-CpG-forming)", "No drastic AA change (CpG-forming)", "Drastic AA change (non-CpG-forming)",  "Drastic AA change (CpG-forming)"), col = cols[c(2,1,3,4)], pch = 16, bg = "white" )
 #legend("topleft", c("Same AA group (non-CpG-forming)", "Same AA group (CpG-forming)", "Changes AA group (non-CpG-forming)",  "Changes AA group (CpG-forming)"), col = cols[c(2,1,3,4)], pch = 16, bg = "white" )
 makePlot.svals(main = "Non-synonymous Sites")
-plotDat.svals(1, 0, 1, cols[3], .1)
-plotDat.svals(1, 0, 0, cols[2], -.3)
-plotDat.svals(1, 1, 0, cols[1], -.1)
-plotDat.svals(1, 1, 1, cols[4], .3)
-plotVals.svals(1, 0, 1, cols[3], .1)
-plotVals.svals(1, 0, 0, cols[2], -.3)
-plotVals.svals(1, 1, 0, cols[1], -.1 )
-plotVals.svals(1, 1, 1, cols[4], .3 )
+plotDat.svals(1, 0, 1, cols[3], .1,mus)
+plotDat.svals(1, 0, 0, cols[2], -.3,mus)
+plotDat.svals(1, 1, 0, cols[1], -.1,mus)
+plotDat.svals(1, 1, 1, cols[4], .3,mus)
+plotVals.svals(1, 0, 1, cols[3], .1,mus)
+plotVals.svals(1, 0, 0, cols[2], -.3,mus)
+plotVals.svals(1, 1, 0, cols[1], -.1 ,mus)
+plotVals.svals(1, 1, 1, cols[4], .3 ,mus)
 abline(v = 1:3 + .5, col = "black")
 dev.off()
 
-
+}
 #Look at modelPredTest.r It has code to look at how good the model predicts frequencies. Not very good. 
 
