@@ -38,8 +38,8 @@ plotter <- function(datset){
     if(datset == "Lehman"){ toPlot <- dataset$colMeansTsLehman }
     toPlot <- toPlot[!is.na(toPlot)]
     colVect <- rep(0, nrow(dataset))
-    colVect[dataset$TypeOfSite == "nonsyn"] <- cols[3]
-    colVect[dataset$TypeOfSite == "syn"] <- cols[1]
+    colVect[dataset$TypeOfSite == "nonsyn"] <- cols[5]
+    colVect[dataset$TypeOfSite == "syn"] <- cols[3]
     colVect[dataset$TypeOfSite == "stop"] <- "black"
     plot(5, type = "n", log = "y", axes = FALSE, xlim = c(0, length(toPlot[!is.na(toPlot)])), ylim = c(10^-(wheresthebreak), max(toPlot, na.rm = TRUE)),  ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", cex.lab = 1.3)
     for(i in 1:wheresthebreak){

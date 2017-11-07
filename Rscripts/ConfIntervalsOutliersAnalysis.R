@@ -1,7 +1,6 @@
 #Script to analyse the frequency data with conf intervals.
 #Using the Bacheler et al data
 
-
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
 library(RColorBrewer)
@@ -26,6 +25,7 @@ xlab<-c(c(15,35,55,75,95),seq(20,228,by=20));
 xlabat<-3*xlab-1+c(rep(0,5),rep(298,11)); 
 RToffset = 0 
 
+if (TRUE){
 pdf(paste("../Output/EstSelCoeffConfIntervals_005",".pdf",sep=""),width=12,height=8)
 
 plottitle<-"#not G #SYN #no CPG" #make plot
@@ -190,16 +190,19 @@ ListOutliers<-c(ListOutliers,data$num[a])
 #    y=data$TSmutrate[data$EstSelCoeff>=cutoff]/data$LC[data$EstSelCoeff>=cutoff]*1.3^runif(length(data$num[data$EstSelCoeff>=cutoff]),0.5,2),labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
 
 dev.off()
+}
 
-OutLiers<-cbind(
-OverviewDF[sort(ListOutliers),c(7,2,7,10,15,11,12,13,14)],
-round(OverviewDF[sort(ListOutliers),c(9)],3)
-)
-names(OutLiers)[10]<-"SelCoeff"
+OutLiers<-OverviewDF[sort(ListOutliers),c(7,2,7,12,13,14,15,16,10,11)]
+
+OutLiers$EstSelCoeff<-round(OutLiers$EstSelCoeff,3)
+OutLiers$EstSelCoeffZan<-round(OutLiers$EstSelCoeffZan,3)
+OutLiers$num[OutLiers$num>297]<-OutLiers$num[OutLiers$num>297]-297
+
+
 for (i in 1:length(OutLiers[,1])){
     OutLiers$WTnt.1[i]<-transition(as.character(OutLiers$WTnt[i]))
     }
 
-print(OutLiers)
+#print(OutLiers)
 
 write.csv(OutLiers,file="../Output/ListOfOutliers.csv",row.names = FALSE)

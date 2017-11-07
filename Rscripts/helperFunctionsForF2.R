@@ -1,4 +1,4 @@
-
+source("Colors.R")
 
 makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
     
@@ -45,8 +45,6 @@ makeDataFrameToModify.withSHAPEandinRT <- function(nsOrNo = 0, CpGorNo = 0, bigA
     return(as.matrix(atcg.mat))
 }
 
-
-
 DataFrameOfData <- function(){
     
     ret.mat <- as.data.frame(matrix(data = 0, ncol = nrow(modcoef), nrow = nrow(PolShapeData)))
@@ -70,7 +68,6 @@ DataFrameOfData <- function(){
     return(as.matrix(ret.mat))
 }
 
-
 makePlot <- function(main){
     
     plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(0.0001, 1), axes = FALSE, ylab = "Predicted frequency of the mutation", xlab = "Mutation type", main = main, log = "y")
@@ -91,14 +88,13 @@ makePlot <- function(main){
 
 plotVals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offset){
     
-    pchpar <- "-"
+    pchpar <- 16
     cexpar <- 2
     
     arrowlwd <- 3.5
     arrowlen <-.15
     
     setUpDat <- makeDataFrameToModify(NsOrNo, CpGorNo, bigAAChangeOrNo)[,rownames(modcoef)]
-    
     
     #compute
     pointToPlot <- exp(setUpDat %*% coef.vals)
@@ -120,7 +116,7 @@ plotVals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offset){
 makePlot.svals <- function(main){
     require(sfsmisc)
     
-    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(.000015, 1), axes = FALSE, ylab = "Predicted selection coefficient", xlab = "Mutation type", main = main, log = "y")
+    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(.00015, 1), axes = FALSE, ylab = "Predicted selection coefficient", xlab = "Mutation type", main = main, log = "y")
     
     col.par <- "gray95"
     abline(h = 1, col = col.par)
@@ -138,12 +134,12 @@ makePlot.svals <- function(main){
     col.par <- "gray95"
 }
 
-
-plotVals.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offset){
+plotVals.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offset, mutrates){
     
     pchpar <- 16
     cexpar <- 2
-    mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
+    #mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
+    mus <- mutrates
     arrowlen <- .15
     arrowlwd <- 3
     
@@ -173,7 +169,7 @@ plotVals.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offset){
     
 }
 
-plotDat.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval){
+plotDat.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval,mutrates){
     
     ## NsOrNo <- 1
     ## CpGorNo <- 0
@@ -184,20 +180,21 @@ plotDat.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval){
     cexpar <- 1
     opacity <- 65
     
-    mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
-    
-    nsinds <- which(suppDat$TypeOfSite == c("syn", "nonsyn")[NsOrNo + 1])
+    #mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
+    mus <- mutrates
+
+    nsinds <- which(OverviewDF$TypeOfSite == c("syn", "nonsyn")[NsOrNo + 1])
     cpginds <- which(makesCpG == CpGorNo)
     aachangeinds <- which(bigChange == bigAAChangeOrNo)
     
     datInds <- intersect(intersect(nsinds, cpginds), aachangeinds)
     
-    xinds <- suppDat$WTnt[datInds]
+    xinds <- as.character(OverviewDF$WTnt[datInds])
     for(i in 1:4){
         xinds[xinds == nucord[i]] <- i
     }
     xinds <- as.numeric(xinds)
-    yinds <- suppDat$colMeansTs0[datInds]
+    yinds <- OverviewDF$MeanFreq[datInds]
     xjit <- rnorm(length(xinds), offsetval, .03)
     
     ysToPlot <- mus[xinds]/ yinds
@@ -218,7 +215,6 @@ plotDat.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval){
     points(xinds + xjit, ysToPlot, col = t.col(colVal, percent = opacity),  pch = pchpar, cex = cexpar)
     
 }
-
 
 makePlot.axisbreak <- function(main){
     
@@ -258,19 +254,19 @@ plotDat <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval){
     cexpar <- 1
     opacity <- 65
     
-    nsinds <- which(suppDat$TypeOfSite == c("syn", "nonsyn")[NsOrNo + 1])
+    nsinds <- which(OverviewDF$TypeOfSite == c("syn", "nonsyn")[NsOrNo + 1])
     cpginds <- which(makesCpG == CpGorNo)
     aachangeinds <- which(bigChange == bigAAChangeOrNo)
     
     datInds <- intersect(intersect(nsinds, cpginds), aachangeinds)
     
-    xinds <- suppDat$WTnt[datInds]
+    xinds <- as.character(OverviewDF$WTnt[datInds])
     for(i in 1:4){
         xinds[xinds == nucord[i]] <- i
     }
     xinds <- as.numeric(xinds)
-    yinds <- suppDat$colMeansTs0[datInds]
-    xjit <- rnorm(length(xinds), offsetval, .03)
+    yinds <- OverviewDF$MeanFreq[datInds]
+    xjit <- rnorm(length(xinds), offsetval, .03) #jitter
     
     for(i in 1:4){
         relinds <- which(xinds == i)
