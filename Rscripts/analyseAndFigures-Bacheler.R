@@ -59,10 +59,10 @@ for (MutRates in c("Abram","Zan")){
     for (i in 40:maxnuc){
     c=0; co = 1
     if (OverviewDF$TypeOfSite[i]=="stop"&OverviewDF$WTnt[i]%in%c("g","c")) {c=1;p=21}
-    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("g","c")) {c=cols[1];p=21}
-    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[1];p=21}
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("g","c")) {c=cols[3];p=21}
+    if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[3];p=21}
     if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("c","g")) {c=cols[4];p=21}
-    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[3];p=21}
+    if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[5];p=21}
     if (i %in% 73:81) {p = 22; co = 2} #for Active site Protease change pch
     if (c!=0) points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
                      bg=rgb(red=col2rgb(c)[1]/255,
@@ -85,9 +85,9 @@ points((legpos+5)*3,legposV/0.7,pch=21,bg=1,col=1,cex=2)
 text((legpos+9)*3,legposV/0.7,"Nonsense",adj=0)
 points((legpos+5)*3,legposV,pch=21,bg=cols[4],col=1,cex=2)
 text((legpos+9)*3,legposV,"Non-syn, C/G",adj=0)
-points((legpos+5)*3,legposV*0.7,pch=21,bg=cols[3],col=1,cex=2)
+points((legpos+5)*3,legposV*0.7,pch=21,bg=cols[5],col=1,cex=2)
 text((legpos+9)*3,legposV*0.7,"Non-syn, A/T",adj=0)
-points((legpos+5)*3,legposV*0.49,pch=21,bg=cols[1],col=1,cex=2)
+points((legpos+5)*3,legposV*0.49,pch=21,bg=cols[3],col=1,cex=2)
 text((legpos+9)*3,legposV*0.49,"Synonymous",adj=0)
 
 dev.off()
@@ -119,7 +119,7 @@ for (i in 172:174){
         t=paste("         non-synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n non-synonymous mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
-             col=cols[3],border=0,
+             col=cols[5],border=0,
              #    main = bquote(paste(.(t),(A %->% G ))), cex=1.3,
              main= "", cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
@@ -132,7 +132,7 @@ for (i in 172:174){
         t=paste("   synonymous mutation",sep="")
         #    t=paste("Protease: site ", i,"\n synonymous mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
-             col=cols[1],border=0,
+             col=cols[3],border=0,
              #    main = bquote(paste(.(t),(G %->% A ))), cex=1.3,
              main= "", cex=1.2,
              xlab="Frequency", ylab="Count",cex.lab=1.4)
@@ -147,10 +147,10 @@ for (i in 172:174){
              yaxt="n",col=1,add=T)}
     if (i == 173){
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
-             yaxt="n",col=cols[3],add=T)}
+             yaxt="n",col=cols[5],add=T)}
     if (i == 174){
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),
-             yaxt="n",col=cols[1],add=T)}
+             yaxt="n",col=cols[3],add=T)}
     
     #next show all data (unfiltered), but only until 50 for 0 cat
     if (i == 172){
@@ -160,11 +160,11 @@ for (i in 172:174){
     if (i == 173){
         hist(c(rep(0,min(zerobar-10,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
              breaks=seq(0,1,by=0.02),add=T,
-             col=cols[3])}
+             col=cols[5])}
     if (i == 174){
         hist(c(rep(0,min(zerobar-10,length(which(freqPatTs0[,i]<0.02)))),freqPatTs0[,i][which(freqPatTs0[,i]>0)]),
              breaks=seq(0,1,by=0.02),add=T,
-             col=cols[1])}
+             col=cols[3])}
     
     axis(2,labels = c(10,20,30,max(zerobar,length(which(freqPatTs0[,i]<0.02)))), 
          at = c(10,20,30,zerobar), las=1)
@@ -183,7 +183,7 @@ for (i in 172:174){
     if (i ==174)Freqs<-read.csv("../Output/SimFreqs174.csv",row.names=1)[1][,1]
     t=paste("simulated data",sep="")
     hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
-         col=cols[5],border=0,
+         col=cols[3],border=0,
          main="",cex=1.2,
          xlab="Frequency", ylab="Count",cex.lab=1.4)
     #title(t,cex=1.2,line=0)
@@ -199,7 +199,7 @@ for (i in 172:174){
                ),
            Freqs[which(Freqs>=0.02)]),
          breaks=seq(0,1,by=0.02),add=T,
-        col=cols[5])
+        col=cols[1])
     axis(2,labels = c(10,20,30,max(zerobar,length(which(Freqs<0.02)))), 
      at = c(10,20,30,zerobar), las=1)
     if (length(which(Freqs<0.02))>=zerobar){
