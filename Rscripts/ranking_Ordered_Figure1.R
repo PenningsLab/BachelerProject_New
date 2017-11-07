@@ -2,9 +2,9 @@
 #setwd("~/Dropbox/HIV_DFE/code")
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
+source("Colors.R")
 library(scales)
 library(plotrix)
-library(RColorBrewer)
 library(sfsmisc)
 
 #Bach.dat <- read.table("../dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
@@ -30,7 +30,7 @@ plotter <- function(datset){
         wheresthebreak <- 5
         remap = 1
     }
-    cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
+#    cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
     #    dataset <- main.dat[main.dat$TypeOfSite != "res",]
     dataset <- main.dat[intersect(intersect(which(main.dat$TypeOfSite != "res"), which(main.dat$TypeOfSite != "overlap")), which(main.dat$TypeOfSite != "exclude") ),]
     if(datset == "Zanini"){ toPlot <- dataset$TSmutrate/dataset$EstSelCoeff }
@@ -38,7 +38,7 @@ plotter <- function(datset){
     if(datset == "Lehman"){ toPlot <- dataset$colMeansTsLehman }
     toPlot <- toPlot[!is.na(toPlot)]
     colVect <- rep(0, nrow(dataset))
-    colVect[dataset$TypeOfSite == "nonsyn"] <- cols[2]
+    colVect[dataset$TypeOfSite == "nonsyn"] <- cols[3]
     colVect[dataset$TypeOfSite == "syn"] <- cols[1]
     colVect[dataset$TypeOfSite == "stop"] <- "black"
     plot(5, type = "n", log = "y", axes = FALSE, xlim = c(0, length(toPlot[!is.na(toPlot)])), ylim = c(10^-(wheresthebreak), max(toPlot, na.rm = TRUE)),  ylab = "Mean mutation frequency", xlab = "Mutations ordered by mean mutation frequency", cex.lab = 1.3)
