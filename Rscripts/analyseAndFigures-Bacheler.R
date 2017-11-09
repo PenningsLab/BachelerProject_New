@@ -68,8 +68,15 @@ for (MutRates in c("Abram","Zan")){
                      bg=rgb(red=col2rgb(c)[1]/255,
                            green=col2rgb(c)[2]/255,
                            blue=col2rgb(c)[3]/255,
-                           maxColorValue = 1,alpha=0.8),
-   cex=2)
+                           maxColorValue = 1,alpha=0.8),cex=2)
+    if (i %in% 73:81) {p = 7; co = 1; 
+    points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
+           bg=rgb(red=col2rgb(c)[1]/255,
+                  green=col2rgb(c)[2]/255,
+                  blue=col2rgb(c)[3]/255,
+                  maxColorValue = 1,alpha=0.8),cex=2)
+    } #for Active site Protease change pch
+    
 }
 
 #Add "Protease" and "RT" words

@@ -60,7 +60,7 @@ plotter <- function(datset){
     toPlot[toPlot == 0] <- 10^-(wheresthebreak)
     points(1:length(toPlot), sort(toPlot), col = colVect[order(toPlot)], pch = "|", cex = cexval)
     axis(1)
-    legend("bottomright", c("Synonymous", "Non-synonymous", "Nonsense"), col = c(cols[1], cols[2], "black"), pch = "|", bg = "white", pt.cex = cexval)
+    legend("bottomright", c("Synonymous", "Non-synonymous", "Nonsense"), col = c(cols[3], cols[5], "black"), pch = "|", bg = "white", pt.cex = cexval)
 }
 
 #for(dat.file in c("Lehman", "Zanini", "Bachelor")){

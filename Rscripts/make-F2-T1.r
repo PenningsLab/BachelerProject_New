@@ -46,7 +46,6 @@ mean(exp(DataFrameOfData()[synrows,] %*% coef.vals))
 mean(OverviewDF$MeanFreq[nonsynrows])
 mean(OverviewDF$MeanFreq[synrows])
 
-
 #Let's do some fresh analysis on this for Marion.
 #What's the average shape coefficient?
 avShape <- mean(PolShapeData$SHAPE)

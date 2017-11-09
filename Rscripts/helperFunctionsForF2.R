@@ -1,4 +1,5 @@
 source("Colors.R")
+library(sfsmisc)
 
 makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){
     
@@ -68,9 +69,9 @@ DataFrameOfData <- function(){
     return(as.matrix(ret.mat))
 }
 
-makePlot <- function(main){
+makePlot <- function(main){ #PSP not sure if this is used ever ...
     
-    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(0.0001, 1), axes = FALSE, ylab = "Predicted frequency of the mutation", xlab = "Mutation type", main = main, log = "y")
+    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(0.0001, .1), axes = FALSE, ylab = "Predicted frequency of the mutation", xlab = "Mutation type", main = main, log = "y")
     axis(1, at = 1:4, c("A", "T", "C", "G"))
     require(sfsmisc)
     eaxis(2)
@@ -218,7 +219,7 @@ plotDat.svals <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval,mu
 
 makePlot.axisbreak <- function(main){
     
-    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(0.00004, 1), axes = FALSE, ylab = "Mutation frequency", xlab = "Mutation type", main = main, log = "y")
+    plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(0.00004, .1), axes = FALSE, ylab = "Mutation frequency", xlab = "Mutation type", main = main, log = "y")
     
     col.par <- "gray95"
     #    abline(h = seq(0, .15, by = .025), col = col.par)
@@ -283,20 +284,4 @@ plotDat <- function(NsOrNo, CpGorNo, bigAAChangeOrNo, colVal, offsetval){
     
 }
 
-#old
-if (FALSE){ #Pleuni: since Alison marked this as old, I think we don't need it. 
-    makePlot.forS <- function(main){
-        require(sfsmisc)
-        plot(0, type = "n", xlim = c(.5, 4.5), ylim = c(.00015, .02), axes = FALSE, ylab = "Predicted selection coefficient", xlab = "Mutation type", main = main, log = "y")
-        axislabs <- c(expression("A" %->% "G"), expression("T" %->% "C"), expression("C" %->% "T"), expression("G" %->% "A"))
-        axis(1, at = 1:4, axislabs)
-        eaxis(2, at = 10^c(-2, -3, -4, -5))
-        col.par <- "gray95"
-        abline(h = (1:9)*10^(-2), col = col.par)
-        abline(h = (1:9)*10^(-3), col = col.par)
-        abline(h = (1:9)*10^(-4), col = col.par)
-        
-        box()
-    }
-}
 
