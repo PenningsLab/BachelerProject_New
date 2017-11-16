@@ -8,6 +8,8 @@ source("helperFunctionsForF2.R")
 #fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t + helix*nonsyn + beta*nonsyn + coil*nonsyn,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
 
 #Run model  
+#we use shape here, which comes from "../Data/Pol_SHAPE.csv" in which the pairing and shape parameters come from shape-parameters.txt, which comes from Watts 2009. 
+#This shape parameter is the part that is measured experimentally. It is not the (evolutionary) pairing probability, which is in a diff column in the same file. 
 if (FALSE) fullmodel.int <- glm(minor ~ inRT + shape + t + c + g + CpG + CpG*t  + t*nonsyn + c*nonsyn + g*nonsyn + nonsyn*CpG + t:nonsyn:CpG + bigAAChange,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
 if (FALSE) sumOfModel <- summary(fullmodel.int)
 
