@@ -34,8 +34,8 @@ wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 #Currently figure 2 in the revision P Genetics Sept 2017
 if (TRUE){
 for (MutRates in c("Abram","Zan")){
-    if (MutRates == "Abram") png("../Output/EstSelCoeffAbramPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
-    if (MutRates == "Zan") png("../Output/EstSelCoeffZanPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
+    if (MutRates == "Abram") png("../Output/EstSelCoeffAbramPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
+    if (MutRates == "Zan") png("../Output/EstSelCoeffZanPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
     par(mfrow=c(1,1))
     maxnuc=984
     par(mar = c(3,5,1,2))
@@ -54,8 +54,6 @@ for (MutRates in c("Abram","Zan")){
     rect(0, 0.00001, 297.5, 2, density = NULL, angle = 45,col="grey70",border = NA)
     for(i in 1:5){abline(h = 1:10 * 10^(-i), col = "gray41")}
 
-    source("Colors.R")
-    #cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
     for (i in 40:maxnuc){
     c=0; co = 1
     if (OverviewDF$TypeOfSite[i]=="stop"&OverviewDF$WTnt[i]%in%c("g","c")) {c=1;p=21}
@@ -63,19 +61,19 @@ for (MutRates in c("Abram","Zan")){
     if (OverviewDF$TypeOfSite[i]=="syn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[3];p=21}
     if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("c","g")) {c=cols[4];p=21}
     if (OverviewDF$TypeOfSite[i]=="nonsyn"&OverviewDF$WTnt[i]%in%c("a","t")) {c=cols[5];p=21}
-    if (i %in% 73:81) {p = 22; co = 2} #for Active site Protease change pch
+#   if (i %in% 73:81) {p = 22; co = 2} #for Active site Protease change pch
     if (c!=0) points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
                      bg=rgb(red=col2rgb(c)[1]/255,
                            green=col2rgb(c)[2]/255,
                            blue=col2rgb(c)[3]/255,
                            maxColorValue = 1,alpha=0.8),cex=2)
-    if (i %in% 73:81) {p = 7; co = 1; 
-    points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
-           bg=rgb(red=col2rgb(c)[1]/255,
-                  green=col2rgb(c)[2]/255,
-                  blue=col2rgb(c)[3]/255,
-                  maxColorValue = 1,alpha=0.8),cex=2)
-    } #for Active site Protease change pch
+#    if (i %in% 73:81) {p = 7; co = 1; 
+#    points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
+#           bg=rgb(red=col2rgb(c)[1]/255,
+#                  green=col2rgb(c)[2]/255,
+#                  blue=col2rgb(c)[3]/255,
+#                  maxColorValue = 1,alpha=0.8),cex=2)
+#    } #for Active site Protease change pch
     
 }
 
@@ -103,7 +101,7 @@ dev.off()
 #Make a figure with single site frequency spectra for Protease AA 58
 #Currently figure 1 in the revision P Genetics Sept 2017
 if (TRUE){
-pdf("../Output/SingleSiteFrequencySpectraPRO_58_July2017.pdf",width=8,height=4)
+pdf("../Output/SingleSiteFrequencySpectraPRO_58_Nov2017.pdf",width=8,height=4)
 zerobar=50; h2=22; x1=0.25
 #cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
 par(mfrow=c(2,3))
