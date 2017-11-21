@@ -1,17 +1,14 @@
 #Read in the data file and convert the first col to rownames
-#setwd("~/Dropbox/HIV_DFE/code")
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
-source("Colors.R")
+#source("Colors.R")
 library(scales)
 library(plotrix)
 library(sfsmisc)
 
-#Bach.dat <- read.table("../dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-#Lehman.dat <- read.table("../dat/OverviewSelCoeffLehman-2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-#Zanini.dat <- read.table("../dat/OverviewSelCoeffZanini-v2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-
 Bach.dat <- read.table("../Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+Lehman.dat <- read.table("../Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+Zanini.dat <- read.table("../Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 plotter <- function(datset){
     par(mar = c(4.5, 4.5, 0.5, 0.5))
@@ -63,17 +60,13 @@ plotter <- function(datset){
     legend("bottomright", c("Synonymous", "Non-synonymous", "Nonsense"), col = c(cols[3], cols[5], "black"), pch = "|", bg = "white", pt.cex = cexval)
 }
 
-#for(dat.file in c("Lehman", "Zanini", "Bachelor")){
-for(dat.file in c("Bachelor")){
-    png(paste("../Output/F1-ordered-Aug2017", dat.file, "-v3.png", sep = ""), height = 6, width = 9,units="in",res=100)
+for(dat.file in c("Lehman", "Zanini", "Bachelor")){
+#for(dat.file in c("Bachelor")){
+    png(paste("../Output/F1-ordered-Nov2017", dat.file, "-v3.png", sep = ""), height = 6, width = 9,units="in",res=100)
     #png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
     plotter(dat.file)
     dev.off()
 }
 
-
-#plotter("Bachelor")
-#plotter("Lehman")
-#plotter("Zanini")
-
+setwd("~/Documents/Git/bachelerProject/")
 
