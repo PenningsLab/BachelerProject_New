@@ -1,4 +1,5 @@
-source("Colors.R")
+source('./baseRscript.R')
+#source("Colors.R")
 library(sfsmisc)
 
 makeDataFrameToModify <- function(nsOrNo = 0, CpGorNo = 0, bigAAChangeOrNo = 0){

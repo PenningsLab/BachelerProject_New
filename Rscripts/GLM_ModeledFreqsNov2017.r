@@ -1,8 +1,7 @@
-#add a comment here to show ryan
 setwd("~/Documents/Git/bachelerProject/Rscripts/")
 
 if (FALSE) source("prepareDataForGLM.R")
-source("helperFunctionsForF2.R")
+source("helperFunctionsForGLMPlots.R")
 
 #Substantially more complicated model with structural elements
 #fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t + helix*nonsyn + beta*nonsyn + coil*nonsyn,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
@@ -257,5 +256,4 @@ abline(v = 1:3 + .5, col = "black")
 dev.off()
 
 }
-#Look at modelPredTest.r It has code to look at how good the model predicts frequencies. Not very good. 
 
