@@ -2,6 +2,7 @@ source("GLM_Analysis/code/prepareDataForGLM.R")
 source("GLM_Analysis/code/helperFunctionsForF2.R")
 
 #Pleuni: running this again and saving output in new folder called "results_filtered_data"
+#PSP Nov 2017: now there's e newer version of ths in bachelerProject/Rscripts
 
 #Substantially more complicated model with structural elements
 #fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t + helix*nonsyn + beta*nonsyn + coil*nonsyn,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
