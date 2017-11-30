@@ -1,4 +1,3 @@
-
 #Working on this Sep 2015, preparing code for Marion and Kristof
 
 #Working on this again in December 2014. Want to test how well we can estimate the mean frequency of a mutation. 
@@ -16,22 +15,18 @@
 #DEPENDS ON source("/Users/pleuni/Documents/Research/HIV/SoftSweepsInHIV/Bacheler2000/RResistanceMutations.r")
 #DEPENDS ON "/Users/pleuni/Documents/Research/HIV/SoftSweepsInHIV/HowToGenbank/HIV1_CON_2004_POL_DNA.fasta"
 #DEPENDS ON OR CREATES "freqPatSite.csv" (No longer, now this is made in createFrequencies-Bacheler.R)
-#CREATES pdf("Distribution_Prob_Seg.pdf")
-#CREATES pdf("freqdis_WITHINallpatients_12.pdf")
-#CREATES pdf("freqdis_WITHINallpatients_3_ffdeg.pdf")
-#CREATES pdf("freqdis_WITHINallpatients_3_NOTffdeg.pdf")
 
 #load relevant libraries and read consensusfasta file
-CurrentWD<-getwd()
-setwd("~/Documents/Git/bachelerProject/Rscripts")
 
 library(ape)
 library(seqinr)
 library(pegas)
+library(sfsmisc)
+library(ggplot2)
 #read the file with the resistance mutations
-source("./RResistanceMutations.r")
+source("Rscripts/RResistanceMutations.r")
 #read the fasta file 
-consensusfasta<-read.dna("../Data/HIV1_CON_2004_POL_DNA.fasta", format = "fasta",as.character=TRUE)	
+consensusfasta<-read.dna("./Data/HIV1_CON_2004_POL_DNA.fasta", format = "fasta",as.character=TRUE)	
 #where is the start of POL? 
 polstart=regexpr("cctca",paste(consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"),],collapse=""))[1]
 consensusB<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_B"), polstart:(polstart+983)]
@@ -39,9 +34,8 @@ consensusA<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_A1"), pol
 consensusC<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_C"), polstart:(polstart+983)]
 consofcons<-consensusfasta[which(row.names(consensusfasta)=="CON_OF_CONS"), polstart:(polstart+983)]
 consensus01AE<-consensusfasta[which(row.names(consensusfasta)=="CONSENSUS_01_AE"), polstart:(polstart+983)]
-list.files(path="../Data/BachelerFiles/FASTAfiles/")->listfastafiles
+list.files(path="./Data/BachelerFiles/FASTAfiles/")->listfastafiles
 
-setwd(CurrentWD)
 
 #* Transition function*
 transition<-function(nuc){
@@ -99,5 +93,5 @@ amCat <- function(AA){
 cols <- c("#66CCEE","#228833","#CCBB44","#EE6677","#AA3377","#4477AA","#BBBBBB")
 # from https://personal.sron.nl/~pault/
 
-
-setwd(CurrentWD)
+NonSynSites<-which(TypeOfSite=="nonsyn")
+SynSites<-which(TypeOfSite=="syn")
