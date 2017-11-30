@@ -2,7 +2,6 @@
 #read the stored data
 #We read a file with WT 0 as threshold, meaning no threshold freqPatTs_Bacheler_Threshold05.csv)
 
-setwd("~/Documents/Git/bachelerProject/")
 read.table("./Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTsFilter
 #calculate mean frequencies
 MeanFreq<-apply(freqPatTsFilter, 2 , mean, na.rm=TRUE)
@@ -12,7 +11,7 @@ MeanFreq<-apply(freqPatTsFilter, 2 , mean, na.rm=TRUE)
 #Get conf intervals by bootsstrapping
 #PSP Nov 11 2015: I don't think we need te bootstrapping, so I put it in an if (FALSE) statement.
 #PSP June 2017: it looks like we may need it after all. 
-if (TRUE){
+if (FALSE){
     btmeansTs<-data.frame(row.names=names(freqPatTsFilter)[1:984]) #each row is a site, each column is a bootstrapped mean
     numbootstraps=1000
     for (j in 1:984){# start with the first site
@@ -34,7 +33,9 @@ if (TRUE){
 #PSP Nov 11 2015 I removed lowerConf and upperConf here because we no longer calculate them
 #PSP June 2017 added them again (lowerConf and upperConf)
 #PSP Nov 11 2015 I renamed x OverviewDFilter and newdata OverviewDFilterOrderedByFreq
-OverviewDFilter<-data.frame(num=1:984,MeanFreq,TypeOfSite,lowerConf,upperConf)
+if (exists("lowerConf")){
+    OverviewDFilter<-data.frame(num=1:984,MeanFreq,TypeOfSite,lowerConf,upperConf)
+}else OverviewDFilter<-data.frame(num=1:984,MeanFreq,TypeOfSite)
 
 OverviewDFilter$WTnt<-consensusB[1:984]
 
@@ -114,4 +115,3 @@ for (i in 1:984){
 
 write.csv(OverviewDFilter,"./Output/OverviewSelCoeff_BachelerFilter.csv")
 
-#plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)

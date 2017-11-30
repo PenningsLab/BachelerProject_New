@@ -23,6 +23,10 @@ library(seqinr)
 library(pegas)
 library(sfsmisc)
 library(ggplot2)
+library(scales)
+library(plotrix)
+library(RColorBrewer)
+
 #read the file with the resistance mutations
 source("Rscripts/RResistanceMutations.r")
 #read the fasta file 

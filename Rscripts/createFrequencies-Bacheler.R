@@ -1,8 +1,6 @@
 #This R script reads the Bacheler et al fasta files and creates a csv file that has frequencies for each patient and each site for the transition mutations. 
 # We filter the data before writing the file. 
-
-#new addition
-#1. only take patients with a consensus sequence at Day0
+#1. only take patients with 100% consensus sequence at Day0
 #2. only consider changed nucleotides when the two other nucleotides in a codon are not mutated
 
 #get all the names of the fasta files for each patient in Bacheler2000 dataset
@@ -10,8 +8,7 @@
 #only needed if the stored data are not O
 
 #Load libraries and necessary files from the baseRscript.Rmd
-setwd("~/Documents/Git/bachelerProject")
-source('Rscripts/baseRscript.R')
+source("Rscripts/baseRscript.R")
 
 #Read the correct fastafiles.
 
@@ -29,16 +26,12 @@ for (i in 1:length(listfastafiles)){ #for each fastafile
 #Remove from listfastafiles the files / patients with too few sequences
 if (length(which(Numseqs<5))>0){listfastafiles<-listfastafiles[-which(Numseqs<5)]}
 
-###############
-#make dataframe that keeps track, for each position and patients, what happened according to criteria and which data points are included
-#filterSummary66<-data.frame(row.names=substr(listfastafiles,1,6))
-#WTthreshold = 0.5 # we need at least 66% wt on day 0 to keep the position and the patient in the freqPatTs_threshold
 
+###############
 ################
 #OK, now we go through the fasta files again to get the frequencies
 
 #Pleuni 05/17 continue here, add WTthreshold = 1
-#Pleuni July 2017: now think the threshold should be 0.5
 
 for (WTthreshold in c(1)){ #0 means no threshold
 
@@ -48,7 +41,6 @@ for (WTthreshold in c(1)){ #0 means no threshold
     Nonconsensusday0_pat_pos<-c()
 
     for (i in 1:length(listfastafiles)){ #for each fastafile
-    #for (i in 1:2){ #for each fastafile
     filename=paste("Data/BachelerFiles/FASTAfiles/",substr(listfastafiles[i],1,6),".fasta",sep="")
     print(filename)
     patfasta<-read.dna(filename, format = "fasta",as.character=TRUE) #read the file
@@ -95,18 +87,11 @@ for (WTthreshold in c(1)){ #0 means no threshold
         }
     }
     }
-    if (WTthreshold == 0){write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler_Threshold0.csv");write.csv(CountData,"Output/BachelerCountData_Threshold0.csv")}
-    if (WTthreshold == 0.5){write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler_Threshold05.csv");write.csv(CountData,"Output/BachelerCountData_Threshold05.csv");write.csv(Nonconsensusday0_pat_pos,"Output/Nonconsensusday0_pat_pos_Threshold05.csv")}
-    if (WTthreshold == 1){write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler_Threshold1.csv");write.csv(CountData,"Output/BachelerCountData_Threshold1.csv")}
+    write.csv(freqPatTs_threshold,file="Output/freqPatTs_Bacheler_Threshold1.csv");
+    write.csv(CountData,"Output/BachelerCountData_Threshold1.csv")
 
 print(paste("For threshold",WTthreshold))
 print("how much data discarded because of filtering?")
 print(length(Nonconsensusday0_pat_pos[,1])/(length(freqPatTs_threshold[,1])*length(freqPatTs_threshold[1,])))
 }
 
-plot(OverviewDFilter$MeanFreq,table(Nonconsensusday0_pat_pos[,1]))
-
-for (i in OverviewDFilter$num){
-    OverviewDFilter$FracFiltered[i]<-length(which(Nonconsensusday0_pat_pos[,2]==i))
-    }
-plot(OverviewDFilter$MeanFreq,OverviewDFilter$FracFiltered)

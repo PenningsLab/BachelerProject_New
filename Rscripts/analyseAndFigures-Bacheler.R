@@ -10,17 +10,11 @@
 #* Plot results (eventually new script)
 
 #Prep data
-if (TRUE){
-setwd("~/Documents/Git/bachelerProject/Rscripts")
-source('./baseRscript.R')
-library(scales)
-library(plotrix)
-library(RColorBrewer)
-library(sfsmisc)
-#July 2017 now read freqPatTs_Bacheler_Threshold05.csv  and OverviewSelCoeff_BachelerFilter.csv
-read.table("../Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
-read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
-}
+source('Rscripts/baseRscript.R')
+read.table("Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+read.csv("Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
+
+#####
 #Test whether non syn muts, syn muts and nonsense muts are different in freq
 
 FreqsSyn<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="syn"]
@@ -34,8 +28,8 @@ wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 #Currently figure 2 in the revision P Genetics Sept 2017
 if (TRUE){
 for (MutRates in c("Abram","Zan")){
-    if (MutRates == "Abram") png("../Output/EstSelCoeffAbramPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
-    if (MutRates == "Zan") png("../Output/EstSelCoeffZanPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
+    if (MutRates == "Abram") png("Output/EstSelCoeffAbramPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
+    if (MutRates == "Zan") png("Output/EstSelCoeffZanPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
     par(mfrow=c(1,1))
     maxnuc=984
     par(mar = c(3,5,1,2))
@@ -67,14 +61,6 @@ for (MutRates in c("Abram","Zan")){
                            green=col2rgb(c)[2]/255,
                            blue=col2rgb(c)[3]/255,
                            maxColorValue = 1,alpha=0.8),cex=2)
-#    if (i %in% 73:81) {p = 7; co = 1; 
-#    points(OverviewDF$num[i],OverviewDF[i,selcoeffcolumn],pch=p,col=co,
-#           bg=rgb(red=col2rgb(c)[1]/255,
-#                  green=col2rgb(c)[2]/255,
-#                  blue=col2rgb(c)[3]/255,
-#                  maxColorValue = 1,alpha=0.8),cex=2)
-#    } #for Active site Protease change pch
-    
 }
 
 #Add "Protease" and "RT" words
@@ -101,7 +87,7 @@ dev.off()
 #Make a figure with single site frequency spectra for Protease AA 58
 #Currently figure 1 in the revision P Genetics Sept 2017
 if (TRUE){
-pdf("../Output/SingleSiteFrequencySpectraPRO_58_Nov2017.pdf",width=8,height=4)
+pdf("Output/SingleSiteFrequencySpectraPRO_58_Nov2017.pdf",width=8,height=4)
 zerobar=50; h2=22; x1=0.25
 #cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
 par(mfrow=c(2,3))
@@ -183,9 +169,9 @@ for (i in 172:174){
 #    par(fig=c(2/3,1,0,1), new = TRUE)
 par(mar = c(4.5,3,1,2))
 for (i in 172:174){
-    if (i ==172)Freqs<-read.csv("../Output/SimFreqs172.csv",row.names=1)[1][,1]
-    if (i ==173)Freqs<-read.csv("../Output/SimFreqs173.csv",row.names=1)[1][,1]
-    if (i ==174)Freqs<-read.csv("../Output/SimFreqs174.csv",row.names=1)[1][,1]
+    if (i ==172)Freqs<-read.csv("Output/SimFreqs172.csv",row.names=1)[1][,1]
+    if (i ==173)Freqs<-read.csv("Output/SimFreqs173.csv",row.names=1)[1][,1]
+    if (i ==174)Freqs<-read.csv("Output/SimFreqs174.csv",row.names=1)[1][,1]
     t=paste("simulated data",sep="")
     hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
          col=cols[3],border=0,
