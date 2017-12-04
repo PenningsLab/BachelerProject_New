@@ -1,37 +1,30 @@
 #Read in the data file and convert the first col to rownames
-setwd("~/Documents/Git/bachelerProject/Rscripts")
-source('./baseRscript.R')
-#source("Colors.R")
-library(scales)
-library(plotrix)
-library(sfsmisc)
+source('Rscripts/baseRscript.R')
 
-Bach.dat <- read.table("../Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Lehman.dat <- read.table("../Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Zanini.dat <- read.table("../Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDF <- read.table("Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDFLehman <- read.table("Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDFZanini <- read.table("Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 plotter <- function(datset){
     par(mar = c(4.5, 4.5, 0.5, 0.5))
     if(datset == "Lehman"){
-        main.dat <- Lehman.dat
+        main.dat <- OverviewDFLehman
         wheresthebreak <- 6
         remap = 1
     }
     if(datset == "Zanini"){
-        main.dat <- Zanini.dat
+        main.dat <- OverviewDFZanini
         wheresthebreak <- 5
         remap = 0
     }
-    if(datset == "Bachelor"){
-        main.dat <- Bach.dat
+    if(datset == "Bacheler"){
+        main.dat <- OverviewDF
         wheresthebreak <- 5
         remap = 1
     }
-#    cols <- brewer.pal(6, "Set2")[c(1, 2, 3, 6)]
-    #    dataset <- main.dat[main.dat$TypeOfSite != "res",]
     dataset <- main.dat[intersect(intersect(which(main.dat$TypeOfSite != "res"), which(main.dat$TypeOfSite != "overlap")), which(main.dat$TypeOfSite != "exclude") ),]
-    if(datset == "Zanini"){ toPlot <- dataset$TSmutrate/dataset$EstSelCoeff }
-    if(datset == "Bachelor"){ toPlot <- dataset$MeanFreq } #MeanFreq replaces colMeansTs0
+    if(datset == "Zanini"){ toPlot <- dataset$colMeansTsZanini }
+    if(datset == "Bacheler"){ toPlot <- dataset$MeanFreq } #MeanFreq replaces colMeansTs0
     if(datset == "Lehman"){ toPlot <- dataset$colMeansTsLehman }
     toPlot <- toPlot[!is.na(toPlot)]
     colVect <- rep(0, nrow(dataset))
@@ -60,13 +53,9 @@ plotter <- function(datset){
     legend("bottomright", c("Synonymous", "Non-synonymous", "Nonsense"), col = c(cols[3], cols[5], "black"), pch = "|", bg = "white", pt.cex = cexval)
 }
 
-for(dat.file in c("Lehman", "Zanini", "Bachelor")){
-#for(dat.file in c("Bachelor")){
-    png(paste("../Output/F1-ordered-Nov2017", dat.file, "-v3.png", sep = ""), height = 6, width = 9,units="in",res=100)
-    #png("../Output/EstSelCoeffPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
+for(dat.file in c("Lehman", "Zanini", "Bacheler")){
+    png(paste("Output/F1-ordered-Nov2017", dat.file, "-v3.png", sep = ""), height = 6, width = 9,units="in",res=100)
     plotter(dat.file)
     dev.off()
 }
-
-setwd("~/Documents/Git/bachelerProject/")
 
