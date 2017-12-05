@@ -1,7 +1,7 @@
 #Will read Zanini files, determine where POL is. 
 
 #This is just for one patient. Later add others.
-ZaniniFiles<-list.files("..//Data/ZaniniNeherData/",recursive = TRUE,pattern="tsv")
+ZaniniFiles<-list.files("Data/ZaniniNeherData/",recursive = TRUE,pattern="tsv")
 
 
 #SeqData<-read.csv(paste("..//Data/ZaniniNeherData/",ZaniniFiles[1],sep=""),sep="\t",skip=1)
@@ -17,7 +17,7 @@ ZaniniFiles<-list.files("..//Data/ZaniniNeherData/",recursive = TRUE,pattern="ts
 #    i=i+polstart+1
 #}
 
-#start of POL is 1719 :-)
+#start of POL is 1719 :-) in patient 1
 #seqinr::translate(X$MajNt[(1719):(1821)])
 #seqinr::translate(X$MajNt[(1719+297):(1821+297)])
 
@@ -30,13 +30,14 @@ freqPatTs_Zanini<-data.frame(row.names=ZaniniFiles)
 for (i in 1:length(ZaniniFiles)){
     print(i)
     print(ZaniniFiles[i])
-    SeqData<-read.csv(paste("..//Data/ZaniniNeherData/",ZaniniFiles[i],sep=""),sep="\t",skip=1)
+    SeqData<-read.csv(paste("Data/ZaniniNeherData/",ZaniniFiles[i],sep=""),sep="\t",skip=1)
     #Pol starts at 1719. First let's just take 100 nt. Later 984.
     pat = substr(ZaniniFiles[i],1,regexpr("/",ZaniniFiles[i])[[1]]-1)
     print(pat)
     SeqData<-SeqData[Prostart$start[which(Prostart$Pat==pat)]:(Prostart$start[which(Prostart$Pat==pat)]+984-1),]
     SeqData$MajNt<-""
     SeqData$MajNt<-apply(SeqData[,1:4],1,function(x) c("a","c","g","t")[which.max(x)])
+    #check that the right position is read  in the right reading frame
     print(seqinr::translate(SeqData$MajNt[1:30]))
     print(seqinr::translate(SeqData$MajNt[298:(298+29)]))  
     #What is transition mut?
@@ -50,11 +51,12 @@ for (i in 1:length(ZaniniFiles)){
         WTNum <- SeqData [k,which(c("a","c","g","t")==SeqData$consensusB[k])]
         #check wether the neigboring sequences are the same / WE CANT DO THIS FOR THE ZANINI DATA
         SeqData$freq[k]<-MutNum/(MutNum+WTNum) 
+        if (MutNum>=WTNum)SeqData$freq[k]<-NA #filter majority manority out 
         freqPatTs_Zanini[i,k]<-SeqData$freq[k]
     }
 }
 
-write.csv(freqPatTs_Zanini,file="../Output/freqPatTs_Zanini.csv")    
+write.csv(freqPatTs_Zanini,file="Output/freqPatTs_Zanini.csv")    
 
 pdf("TRY.pdf")
 par(mfrow=c(3,3))
