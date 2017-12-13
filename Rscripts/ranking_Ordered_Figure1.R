@@ -1,7 +1,7 @@
 #Read in the data file and convert the first col to rownames
 source('Rscripts/baseRscript.R')
 
-OverviewDF <- read.table("Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDFBacheler <- read.table("Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 OverviewDFLehman <- read.table("Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 OverviewDFZanini <- read.table("Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
@@ -18,7 +18,7 @@ plotter <- function(datset){
         remap = 0
     }
     if(datset == "Bacheler"){
-        main.dat <- OverviewDF
+        main.dat <- OverviewDFBacheler
         wheresthebreak <- 5
         remap = 1
     }

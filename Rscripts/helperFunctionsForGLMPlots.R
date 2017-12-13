@@ -1,4 +1,4 @@
-source('./baseRscript.R')
+source('Rscripts/baseRscript.R')
 #source("Colors.R")
 library(sfsmisc)
 

@@ -1,12 +1,9 @@
 #Script to analyse the frequency data with conf intervals.
 #Using the Bacheler et al data
-
-setwd("~/Documents/Git/bachelerProject/Rscripts")
 source('./baseRscript.R')
-library(RColorBrewer)
 
-read.table("../Output/freqPatTs_Bacheler.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
-read.csv("../Output/OverviewSelCoeff_Bacheler.csv")->OverviewDF
+read.table("Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
+read.csv("Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
 
 ytxt<-"Estimated Selection Coefficient (cost)"
 ylab<-c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0)
@@ -26,7 +23,7 @@ xlabat<-3*xlab-1+c(rep(0,5),rep(298,11));
 RToffset = 0 
 
 if (TRUE){
-pdf(paste("../Output/EstSelCoeffConfIntervals_005",".pdf",sep=""),width=12,height=8)
+#pdf(paste("Output/EstSelCoeffConfIntervals_005",".pdf",sep=""),width=12,height=8)
 
 plottitle<-"#not G #SYN #no CPG" #make plot
 plot(OverviewDF$num[xrange],OverviewDF$EstSelCoeff[xrange],log="y", ylab=ytxt, xlab =xtxt, xaxt="n",yaxt="n",col="darkgrey",t="c",pch=".", ylim=c(0.9*10^-5,1.2))
@@ -35,6 +32,7 @@ axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3,plottitle)
+#group 1 synonymous, non-G, non-CpG
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt!="g"&OverviewDF$makesCpG==0,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
 #show outliers
@@ -44,7 +42,7 @@ data$num[data$EstSelCoeff<=cutoff]
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.7,1.3),labels=data$AAnum[a],cex=0.3)
@@ -56,12 +54,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 2 synonymous, non-G, CpG
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt!="g"&OverviewDF$makesCpG==1,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -73,12 +72,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 3 synonymous, G
 data<-OverviewDF[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g",]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -90,12 +90,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 4 non-syn, A or T, no-CpG, no-drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==0,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -107,12 +108,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 5 non-syn, A or T, CpG, no-drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==1&OverviewDF$bigAAChange==0,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -124,12 +126,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 6 non-syn, A or T, no-CpG, drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==0&OverviewDF$bigAAChange==1,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -141,12 +144,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 7 non-syn, A or T, CpG, drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="a"|OverviewDF$WTnt=="t")&OverviewDF$makesCpG==1&OverviewDF$bigAAChange==1,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11])  
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -158,12 +162,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 8 non-syn, C or G, no-CpG no-drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="c"|OverviewDF$WTnt=="g")&OverviewDF$bigAAChange==0,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -175,12 +180,13 @@ axis(1,at=xlabat,labels=xlab);axis(2,at=ylab,labels=ylab)
 abline(v = 297.5,lty=2); text(150,10^-5,"<--- Protease --->");text(600,10^-5,"<--- RT --->")
 
 mtext(side = 3, plottitle)
+#group 9 non-syn, C or G, no-CpG drastic
 data<-OverviewDF[OverviewDF$TypeOfSite=="nonsyn"&(OverviewDF$WTnt=="c"|OverviewDF$WTnt=="g")&OverviewDF$bigAAChange==1,]
 points(data$num,data$EstSelCoeff,pch=21,bg=brewer.pal(11, "Spectral")[11]) 
 #show outliers 
 cutoff<-data$EstSelCoeff[order(data$EstSelCoeff)][ceiling(length(data$num)*(1-perc))] 
 points(data$num[data$EstSelCoeff>=cutoff],data$EstSelCoeff[data$EstSelCoeff>=cutoff],pch=21,bg="red")
-arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
+#arrows(x0=data$num,y0=data$TSmutrate/data$LC,x1=data$num,y1=data$TSmutrate/data$upperConf,code=3,length = 0.05,angle=90)
 #add locations for outliers
 a=data$EstSelCoeff>=cutoff #PSP 2017 June use this to add conf intervals
 text(data$num[a],y=data$TSmutrate[a]/data$LC[a]*1.3^runif(length(data$num[a]),0.9,1.1),labels=data$AAnum[a],cex=0.5)
@@ -189,20 +195,25 @@ ListOutliers<-c(ListOutliers,data$num[a])
 #text(data$num[data$EstSelCoeff>=cutoff],
 #    y=data$TSmutrate[data$EstSelCoeff>=cutoff]/data$LC[data$EstSelCoeff>=cutoff]*1.3^runif(length(data$num[data$EstSelCoeff>=cutoff]),0.5,2),labels=ceiling(data$num[a]/3)-RToffset,cex=0.5)
 
-dev.off()
+#dev.off()
 }
 
-OutLiers<-OverviewDF[sort(ListOutliers),c(7,2,7,12,13,14,15,16,10,11)]
+OutLiers<-OverviewDF[sort(ListOutliers),c(5,5,2,10,11,12,13,14,8)]
 
-OutLiers$EstSelCoeff<-round(OutLiers$EstSelCoeff,3)
-OutLiers$EstSelCoeffZan<-round(OutLiers$EstSelCoeffZan,3)
+OutLiers$EstSelCoeff<-round(OutLiers$EstSelCoeff,4)
+#OutLiers$EstSelCoeffZan<-round(OutLiers$EstSelCoeffZan,3)
 OutLiers$num[OutLiers$num>297]<-OutLiers$num[OutLiers$num>297]-297
 
 
-for (i in 1:length(OutLiers[,1])){
+for (i in 1:length(OutLiers[,1])){ #add Mutated nt
     OutLiers$WTnt.1[i]<-transition(as.character(OutLiers$WTnt[i]))
-    }
+}
+names(OutLiers)[2]<-"Mut"
 
-#print(OutLiers)
+#write.csv(OutLiers,file="Output/ListOfOutliers.csv",row.names = FALSE)
+require(xtable)
+OutLiers$num<-as.character(OutLiers$num)
 
-write.csv(OutLiers,file="../Output/ListOfOutliers.csv",row.names = FALSE)
+    print(xtable(OutLiers[OutLiers$ProRT=="Pro",]),type="Latex",file="Output/OutliersPro.html")
+print(xtable(OutLiers[OutLiers$ProRT=="RT",]),type="Latex",file="Output/OutliersRT.txt")
+#WTnt & Mut & site & WTaa & MUTaa & dras.AA & CpG & Loc & cost

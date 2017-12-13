@@ -3,8 +3,6 @@
 setwd("~/Documents/Git/bachelerProject/Rscripts")
 #Use filtered data May 2017
 dat <- read.table("../Output/BachelerCountData_Threshold1.csv", sep = ",", stringsAsFactors = FALSE, header = TRUE)
-#suppDat <- read.table("../GLM_Analysis/dat/OverviewSelCoeffwProteinFeatures.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-#suppDatShape <- read.table("GLM_Analysis/dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 OverviewDF<-read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv")
 PolShapeData<-read.csv("../Data/Pol_SHAPE.csv")
 
@@ -72,10 +70,10 @@ dim(datRows)
 #3355728
 
 #This part of dataprep only needs to be run once. 
-if (FALSE){ #THIS ONLY NEEDS TO RUN ONCE, TO CREATE "GLM_Analysis/dat/datFitModel.csv"
+#THIS ONLY NEEDS TO RUN ONCE, TO CREATE "GLM_Analysis/dat/datFitModel.csv"
+if (FALSE){ 
 relInd <- 1
 #Leave out the first 40 positions
-#for(i in 40:100){
 for(i in 40:length(OverviewDF$num)){
         
 	print(i)

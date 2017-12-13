@@ -1,10 +1,8 @@
-setwd("~/Documents/Git/bachelerProject/Rscripts/")
-
 if (FALSE) source("prepareDataForGLM.R")
-source("helperFunctionsForGLMPlots.R")
+source("Rscripts/helperFunctionsForGLMPlots.R")
 
-#Substantially more complicated model with structural elements
-#fullmodel.int <- glm(minor ~ t + c + g + bigAAChange + inRT + t*nonsyn + c*nonsyn + g*nonsyn + shape + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t + helix*nonsyn + beta*nonsyn + coil*nonsyn,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
+#read datFitModel.csv , which was prepared by prepareDataForGLM.R
+read.csv("Output/datFitModel.csv",row.names=1)->datFitModel
 
 #Run model  
 #we use shape here, which comes from "../Data/Pol_SHAPE.csv" in which the pairing and shape parameters come from shape-parameters.txt, which comes from Watts 2009. 
@@ -59,11 +57,9 @@ included<-c(which(mutrates$Nucleotide.substitution=="AG"),
   which(mutrates$Nucleotide.substitution=="CU"),
   which(mutrates$Nucleotide.substitution=="GA"))
 
-for (MutRates in c("Abram","Zan")){
+for (MutRates in c("Abram")){
     if (MutRates == "Abram") mus<-mutrates$Probability[included] #This reads the Abram mut rates
-    if (MutRates == "Zan") mus<-mutrates$ZaniniProb[included] #This reads the Abram mut rates
-    #mus <- c(1.11e-05, 1.11e-05, 2.41e-05, 5.48e-05)
-
+    if (MutRates == "Zan") mus<-mutrates$ZaniniProb[included]
 # Point 1:
 #synonymous CpG forming mutations
 CpGSyn<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,1,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals)
@@ -197,15 +193,12 @@ cat(round(noNewCpG[4],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep=
 cat(        "vs" ,file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 cat(round(noNewCpG[1],4),file = "../Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
-#PSP: continue here. 
+}
+
 
 #Make plots
 library(plotrix)
-require(RColorBrewer)
 png("../Output/modeled_freqs_Sep2017_2.png",width=12,height=7.5,units="in",res=100)
-#if (MutRates == "Zan") png("../Output/EstSelCoeffZanPRO_aug2017.png",width=12,height=7.5,units="in",res=100)
-#pdf("../Output/modeled_freqs_May2017_2.pdf", width = 12, height = 7)
-#cols <- brewer.pal(4, "Set2")
 layout(matrix(1:2, nrow = 1))
 par(mar = c(4, 4.5, 1.5, 1))
 makePlot.axisbreak(main = "Synonymous Sites")
@@ -228,9 +221,7 @@ plotVals(1, 1, 1, cols[4], .3 )
 abline(v = 1:3 + .5, col = "black")
 dev.off()
 
-#pdf("../Output/modeled_sels_May2017.pdf", width = 12, height = 7)
-if (MutRates == "Abram") png("../Output/modeled_sels_AbramSEP2017.png",width=12,height=7.5,units="in",res=100)
-if (MutRates == "Zan") png("../Output/modeled_sels_ZanSEP2017.png",width=12,height=7.5,units="in",res=100)
+png("../Output/modeled_sels_AbramSEP2017.png",width=12,height=7.5,units="in",res=100)
 #cols <- brewer.pal(4, "Set2")
 layout(matrix(1:2, nrow = 1))
 par(mar = c(4, 4.5, 1.5, 1))
@@ -255,5 +246,4 @@ plotVals.svals(1, 1, 1, cols[4], .3 ,mus)
 abline(v = 1:3 + .5, col = "black")
 dev.off()
 
-}
 

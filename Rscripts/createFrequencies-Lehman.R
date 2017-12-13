@@ -1,11 +1,9 @@
 #This R script reads the Lehman SRA fasta files and creates a csv file that has frequencies for each patient and each site for the transition mutations. 
 # We filter the data before writing the file. 
 
-#setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Rscripts")
-setwd("~/Documents/Git/bachelerProject/Rscripts")
-listLehmanfiles<-list.files("../Data/LehmanData/PleuniAlignments")
+listLehmanfiles<-list.files("Data/LehmanData/PleuniAlignments")
 
-SraRunInfo<-read.csv("../Data//LehmanData/SraRunInfo.csv")
+SraRunInfo<-read.csv("Data//LehmanData/SraRunInfo.csv")
 SraRunInfo<-SraRunInfo[,which(names(SraRunInfo)%in%c("Run","SampleName"))]
 #    data.frame(Run=SraRunInfo$Run, SampleName=SraRunInfo$SampleName)
 
@@ -35,7 +33,7 @@ shortfilenames<-shortfilenames[listtokeep]
 #only needed if the stored data are not O
 
 #Load libraries and necessary files from the baseRscript.Rmd
-source('baseRscript.R')
+source('Rscripts/baseRscript.R')
 
 ###############
 #make dataframe with frequencies for all non-muts for all patients for all sites filtered with the WT threshold.
