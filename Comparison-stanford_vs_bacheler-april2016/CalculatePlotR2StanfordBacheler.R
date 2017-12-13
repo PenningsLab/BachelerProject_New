@@ -5,7 +5,7 @@
 setwd("~/Documents/Git/bachelerProject/Comparison-stanford_vs_bacheler-april2016")
 #setwd("~/Dropbox/MarionKristofBachelerProject/GitMarionKristof/bachelerProject/Comparison-stanford_vs_bacheler-april2016")
 source("../Rscripts/baseRscript.R")
-OverviewDFBach<-read.csv("../Output/OverviewSelCoeff_Bacheler.csv",row.names=1)
+OverviewDFBach<-read.csv("../Output/OverviewSelCoeff_BachelerFilter.csv",row.names=1)
 OverviewDFBach$StanfordFreqs<-t(read.csv("subtypeB-frequencies_stanford_pr_rt_naive.csv"))[1:length(OverviewDFBach[,1])]
 
 OverviewDFZanini<-read.csv("../Output/OverviewSelCoeffZanini.csv",row.names=1)
@@ -82,18 +82,21 @@ text(0.05,0.3,paste("R^2 = ",round(R2LehmanStanford,2)))
 #Plot Bacheler
 plot(OverviewDFBach$MeanFreq+0.0001,OverviewDFBach$StanfordFreqs+0.0001,
      main="Within vs between-host frequencies Bacheler",col=0,
-     xlim=c(0.0001,1),ylim=c(0.0001,1),
+     xlim=c(0.0001,.05),ylim=c(0.0001,.2),
      xlab="Within-host frequencies Bacheler",
      ylab="Between-host frequencies Stanford",
      log="xy"
 )
 points(OverviewDFBach$MeanFreq[synsites]+0.0001,OverviewDFBach$StanfordFreqs[synsites]+0.0001,
-       col="lightgreen",pch=16)
+       col=cols[3],pch=16)
 points(OverviewDFBach$MeanFreq[nonsynsites]+0.0001,OverviewDFBach$StanfordFreqs[nonsynsites]+0.0001,
-       col="orange",pch=16)
+       col=cols[5],pch=16)
 
-R2BachStanford<-cor.test(OverviewDFBach$MeanFreq[c(synsites,nonsynsites)],OverviewDFBach$StanfordFreqs[c(synsites,nonsynsites)])$estimate
-text(0.05,0.3,paste("R^2 = ",round(R2BachStanford,2)))
+R2BachStanford<-cor.test(
+    OverviewDFBach$MeanFreq[c(synsites,nonsynsites)],
+    OverviewDFBach$StanfordFreqs[c(synsites,nonsynsites)],
+    method="s")$estimate
+text(0.0002,0.1,paste("R^2 = ",round(R2BachStanford,2)))
 
 #Plot Bacheler RT only
 plot(OverviewDFBach$MeanFreq+0.0001,OverviewDFBach$StanfordFreqs+0.0001,

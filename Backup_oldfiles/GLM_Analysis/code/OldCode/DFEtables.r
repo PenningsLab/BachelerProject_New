@@ -1,14 +1,21 @@
+setwd("/Users/pleuni/Documents/Git/bachelerProject")
+source("Rscripts/baseRscript.R")
+
+OverviewDFBacheler <- read.table("Output/OverviewSelCoeff_BachelerFilter.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDFLehman <- read.table("Output/OverviewSelCoeffLehman.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+OverviewDFZanini <- read.table("Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 #Read in the data file and convert the first col to rownames
 #Bach.dat <- read.table("../dat/OverviewSelCoeffwSHAPE.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Bach.dat <- read.table("../dat/OverviewSelCoeffwProteinFeatures.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Lehman.dat <- read.table("../dat/OverviewSelCoeffLehman-2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
-Zanini.dat <- read.table("../dat/OverviewSelCoeffZanini-v2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+#Bach.dat <- read.table("../dat/OverviewSelCoeffwProteinFeatures.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+#Lehman.dat <- read.table("../dat/OverviewSelCoeffLehman-2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+#Zanini.dat <- read.table("../dat/OverviewSelCoeffZanini-v2.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 list.files("../dat/")
 #Read in other data file with mutation rates
 # PSP: next line copied from dfe.r
 suppDat <- read.table("../dat/OverviewSelCoeff.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+suppDat <-OverviewDFBacheler
 
 zanMut <- rep(0, nrow(suppDat))
 zanMut[suppDat$WTnt == "a"] <- 5.4*10^(-6)
@@ -17,10 +24,8 @@ zanMut[suppDat$WTnt == "c"] <- 1.1*10^(-5)
 zanMut[suppDat$WTnt == "g"] <- 1.5*10^(-5)
 
 runSub <- function(datName, subDat, plotMe = TRUE, zan = FALSE){
-
-
     if(datName == "bach"){
-        freqColName <- "colMeansTs0"
+        freqColName <- "MeanFreq"
     }
     if(datName == "zanini"){
         freqColName <- "colMeansTsZanini"
@@ -75,10 +80,6 @@ runSub <- function(datName, subDat, plotMe = TRUE, zan = FALSE){
 }
 
 
-
-    
-
-
 layout(matrix(1:2, nrow = 1))
 testseq <- seq(-.2, .5, by = .001)
 plotp.1 <- c()
@@ -95,8 +96,6 @@ for(i in 1:length(testseq)){
 plot(testseq,plotp.2)
 abline(v = testseq[which(plotp.2 == max(plotp.2))])
 
-
-
 auths <- c("bach", "zanini", "lehman")
 tOrF <- c(TRUE, FALSE)
 toXtable <- matrix(data = "", nrow = 6, ncol  = 6)
@@ -104,13 +103,13 @@ for(i in auths){
     print(i)
     rowForObs <- 2 * which(i == auths) - 1
     if(i == "bach"){
-        subDat <- Bach.dat
+        subDat <- OverviewDFBacheler
     }
     if(i == "zanini"){
-        subDat <- Zanini.dat
+        subDat <- OverviewDFZanini
     }
     if(i == "lehman"){
-        subDat <- Lehman.dat
+        subDat <- OverviewDFLehman
     }
 (table(subDat[grep("syn|stop", subDat$TypeOfSite),]$TypeOfSite))
 #(table(subDat[grep("syn|stop", subDat$TypeOfSite, invert = TRUE),]$TypeOfSite))
@@ -156,9 +155,9 @@ rownames(toXtable) <- c("Bacheler",  " ", "Zanini", "  ", "Lehman", "   ")
 require(xtable)
 xtable(toXtable)
 
+if (FALSE){
 
-
-pdf("../out/fitDFEsabr.pdf", width = 5, height = 5)
+#pdf("../out/fitDFEsabr.pdf", width = 5, height = 5)
 par(mar = c(4.5, 4.5, 1, 1))
 scales <- as.numeric(toXtable[c(1,3, 5),2])
 shapes <- as.numeric(toXtable[c(1,3, 5),3])
@@ -169,10 +168,10 @@ for(i in 1:3){
 }
 legend("topright", c("Bacheler", "Zanini", "Lehman"), col = cols[1:3], lwd = 2)
 abline(v = 0, lty = "dashed", lwd = 2, col = "gray90")
-dev.off()
+#dev.off()
 
 
-pdf("../out/fitDFEzan.pdf", width = 5, height = 5)
+#pdf("../out/fitDFEzan.pdf", width = 5, height = 5)
 par(mar = c(4.5, 4.5, 1, 1))
 scales <- as.numeric(toXtable[c(1,3, 5),4])
 shapes <- as.numeric(toXtable[c(1,3, 5),5])
@@ -183,4 +182,6 @@ for(i in 1:3){
 }
 legend("topright", c("Bacheler", "Zanini", "Lehman"), col = cols[1:3], lwd = 2)
 abline(v = 0, lty = "dashed", lwd = 2, col = "gray90")
-dev.off()
+#dev.off()
+
+}

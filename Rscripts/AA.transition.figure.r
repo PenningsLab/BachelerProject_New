@@ -54,7 +54,7 @@ for(i in unique(allComps[,1])){
     mtext(paste(i), 1, line = 1, at = mean(rangevals), cex = labsize)
 }
 legend(49, -1, c("A", "T", "C", "G"), col = c(cols, "black", "black"), pch = c(15, 15, 15, 15), xpd = NA, box.lty = "blank", title = "Ancestral\nnucleotide")
-legend(49, -2.5, c("Yes", "No"), pch = pchs, xpd = NA, border = "white", box.lwd = 0, title = "Drastic AA\nchange", box.lty = "blank")
+legend(49, -2.5, c("No", "Yes"), pch = pchs, xpd = NA, border = "white", box.lwd = 0, title = "Drastic AA\nchange", box.lty = "blank")
 
 dev.off()
 }
