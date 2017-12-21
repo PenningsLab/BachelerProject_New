@@ -14,7 +14,7 @@ if (FALSE) sumOfModel <- summary(fullmodel.int)
 require(xtable)
 #This doesn't work yet: #write(xtable(sumOfModel, digits = 3), "ModelTable.txt")
 xtable(sumOfModel, digits = 3)
-print(xtable(sumOfModel, digits = 3),type="html",file="../Output/SumOfGLMModel1.html")
+print(xtable(sumOfModel, digits = 3),type="html",file="Output/SumOfGLMModel1.html")
 
 #fullmodel.small <- glm(minor ~ t + c + g + bigAAChange + t*nonsyn + c*nonsyn + g*nonsyn + CpG + CpG*t  + CpG*nonsyn + CpG*nonsyn*t,  family = "binomial", data = datFitModel[datFitModel$res == 0 & datFitModel$stop == 0,])
 #sumOfModel <- summary(fullmodel.small)

@@ -41,8 +41,9 @@ for (MutRates in c("Abram","Zan")){
      col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,979))
     axis(1,at=c(3*seq(15,95,by=20)-1,296+30),labels=c(seq(15,95,by=20),""))
     axis(1,at=3*seq(109,349,by=20)-1,labels=seq(109-99,349-99,by=20))
-    axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0,tick=FALSE)
-    eaxis(side = 2, at = 10^((-0):(-(5))),label=rep("",6))
+   #axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0,tick=FALSE)
+    #eaxis(side = 2, at = 10^((-0):(-(5))),label=rep("",6))
+    eaxis(side = 2, at = 10^((-0):(-(5))))
 
 #color Protease region grey
     rect(0, 0.00001, 297.5, 2, density = NULL, angle = 45,col="grey70",border = NA)

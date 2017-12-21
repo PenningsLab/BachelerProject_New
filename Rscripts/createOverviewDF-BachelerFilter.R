@@ -78,7 +78,6 @@ for (i in 1:984){
 
 #Add whether AA change is drastic 
 OverviewDFilter$bigAAChange<-0
-
 for(i in 1:nrow(OverviewDFilter)){
     WT <- amCat(OverviewDFilter[i,'WTAA'])
     MUT <- amCat(OverviewDFilter[i,'MUTAA'])

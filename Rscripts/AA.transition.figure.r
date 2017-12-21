@@ -29,7 +29,7 @@ if (TRUE){
 pdf("Output/aachangesNS_2017Nov.pdf", height = 5, width = 9)
 par(mar = c(5, 4, 1, 5))
 plot(0, type = "n", xlim = c(1, nrow(allComps)), ylim = c(ylimval, 0), axes = FALSE, ylab = "Estimated Selection Coefficient (cost)", xlab = "Mutation")
-axis(side = 2, at = seq(0, -12, by = -2), labels = expression(10^0, 10^-2, 10^-4, 10^-6, 10^-8, 10^-10, 10^-12), las = 2)
+axis(side = 2, at = seq(0, -4, by = -1), labels = expression(10^0, 10^-1, 10^-2, 10^-3, 10^-4), las = 2)
 #mtext(side = 2, at = atvals, text = rep(toMod, 4), line = 1, las = 2)
 abline(v = 1:nrow(allComps), col = "grey90")
 abline(h = 0, col = "grey90")
