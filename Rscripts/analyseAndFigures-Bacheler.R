@@ -24,6 +24,23 @@ FreqsStop<-OverviewDF$MeanFreq[OverviewDF$TypeOfSite=="stop"]
 wilcox.test(FreqsSyn, FreqsNonSyn,alternative = "greater", paired = FALSE)
 wilcox.test(FreqsNonSyn,FreqsStop,alternative = "greater", paired = FALSE)
 
+#####
+#Test whether synonymous C to T  muts and G to A , are more costly than A to G 
+CostSynNoCpGA2G<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0]
+CostSynNoCpGC2T<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0]
+CostSynNoCpGG2A<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="syn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0]
+wilcox.test(CostSynNoCpGC2T,CostSynNoCpGA2G,alternative = "greater", paired = FALSE)
+wilcox.test(CostSynNoCpGG2A,CostSynNoCpGA2G,alternative = "greater", paired = FALSE)
+
+#####
+#Test whether non-synonymous C to T  muts and G to A , are more costly than A to G 
+CostnonSynNoCpGA2G<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="a"&OverviewDF$makesCpG==0]
+CostnonSynNoCpGC2T<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="c"&OverviewDF$makesCpG==0]
+CostnonSynNoCpGG2A<-OverviewDF$EstSelCoeff[OverviewDF$TypeOfSite=="nonsyn"&OverviewDF$WTnt=="g"&OverviewDF$makesCpG==0]
+wilcox.test(CostnonSynNoCpGC2T,CostnonSynNoCpGA2G,alternative = "greater", paired = FALSE)
+wilcox.test(CostnonSynNoCpGG2A,CostnonSynNoCpGA2G,alternative = "greater", paired = FALSE)
+
+
 #Make a figure with the selection coefficients across Pol
 #Currently figure 2 in the revision P Genetics Sept 2017
 if (TRUE){
