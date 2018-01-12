@@ -31,8 +31,10 @@ par(mar = c(5, 4, 1, 5))
 plot(0, type = "n", xlim = c(1, nrow(allComps)), ylim = c(ylimval, 0), axes = FALSE, ylab = "Estimated Selection Coefficient (cost)", xlab = "Mutation")
 axis(side = 2, at = seq(0, -4, by = -1), labels = expression(10^0, 10^-1, 10^-2, 10^-3, 10^-4), las = 2)
 #mtext(side = 2, at = atvals, text = rep(toMod, 4), line = 1, las = 2)
-abline(v = 1:nrow(allComps), col = "grey90")
-abline(h = 0, col = "grey90")
+#abline(v = 1:nrow(allComps), col = "grey90", lty=c(1,2,3))
+abline(v = c(1:2, 5:6, 9:10, 15,16,20,21,25:27,30:31, 33:34,40,41,45), col = "pink", lty=1, lwd=14.2)
+abline(v = 1:nrow(allComps), col = "grey90", lty=1, lwd=3)
+abline(h = 0, col = "grey90", lwd=2)
 box()
 for(i in 1:nrow(allComps)){
     relInds <- intersect(which(Bach.datNS$WTAA == allComps[i, 1]), which(Bach.datNS$MUTAA == allComps[i, 2]))
@@ -48,11 +50,21 @@ mtext("Mutant", 1, line = 0, at = -1, cex = labsize, adj = 1)
 linepos=4.4
 segments(-6 , -linepos, -0.5, -linepos, col="black", xpd=NA)
 mtext("Ancestral", 1, line = 1, at = -1, cex = labsize, adj = 1)
+
+yesnoswitch=1
 for(i in unique(allComps[,1])){
     rangevals <- range(which(allComps[,1] == i))
+#    if (yesnoswitch==1){polygon(mean(rangevals), -linepos-.1, mean(rangevals), -linepos+.1, col="pink", xpd=NA,lwd=15)}
     segments(rangevals[1] - .25, -linepos, rangevals[2] + .25, -linepos, col="black", xpd=NA)
-    mtext(paste(i), 1, line = 1, at = mean(rangevals), cex = labsize)
+    if (yesnoswitch==1)polygon(c(rangevals[1] - .25,rangevals[2] + .25,rangevals[2] + .25,rangevals[1] - .25),
+                               c(-linepos-.01,-linepos-.01,-linepos-.2,-linepos-.2),col="lightpink",border=0,xpd=NA)
+    if (i =="W")polygon(c(rangevals[1] - .5,rangevals[2] + .5,rangevals[2] + .5,rangevals[1] - .5),
+                        c(-linepos-.01,-linepos-.01,-linepos-.2,-linepos-.2),col="lightpink",border=0,xpd=NA)
+    if (yesnoswitch==1)mtext(paste(i), 1, line = 1, at = mean(rangevals), cex = labsize,col=1)
+    if (yesnoswitch==-1)mtext(paste(i), 1, line = 1, at = mean(rangevals), cex = labsize,col=1)
+    yesnoswitch=yesnoswitch*-1
 }
+
 legend(49, -1, c("A", "T", "C", "G"), col = c(cols, "black", "black"), pch = c(15, 15, 15, 15), xpd = NA, box.lty = "blank", title = "Ancestral\nnucleotide")
 legend(49, -2.5, c("No", "Yes"), pch = pchs, xpd = NA, border = "white", box.lwd = 0, title = "Drastic AA\nchange", box.lty = "blank")
 
