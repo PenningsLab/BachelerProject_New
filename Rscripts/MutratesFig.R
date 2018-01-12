@@ -9,7 +9,7 @@ included<-c(which(mutrates$Nucleotide.substitution=="AG"),
             which(mutrates$Nucleotide.substitution=="UC"),
             which(mutrates$Nucleotide.substitution=="CU"),
             which(mutrates$Nucleotide.substitution=="GA"))
-pdf("Output/MutationRatesUsed.pdf")
+#pdf("Output/MutationRatesUsed.pdf")
 par(mar = c(4.5, 6, 4, 0.5))
 barplot(t(as.matrix(mutrates[included,2:3])),beside=TRUE,ylim=c(0,6*10^-5),
         xaxt="n",yaxt="n",ylab="",main="")
@@ -21,4 +21,12 @@ mtext("Estimated mutation rates", side=2, line=4,cex=1.3)
 mtext("Mutation rate estimates used", side=3, line=1,cex=1.4)
 text(xvalues-.5,mutrates[included,2]+0.1*10^-5,"Abram")
 text(xvalues+.5,mutrates[included,3]+0.1*10^-5,"Zanini")
-dev.off()
+#dev.off()
+
+mutrates[included,]
+
+require(xtable)
+xtable(mutrates[c(2,3,4,5,7,8,9,10,12,13,14,15),], digits = 3)
+print(xtable(sumOfModel, digits = 3),type="html",file="Output/SumOfGLMModel1.html")
+
+mutrates[,2]
