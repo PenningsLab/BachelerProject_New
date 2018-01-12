@@ -3,18 +3,18 @@ MUTRATES FROM ABRAM 2010
 
 POINT 1
 
-Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are 2 times more costly (selection coefficient appr. 0.004) than non-CpG-creating synonymous mutations (selection coefficient ~0.002 )).
+Using model-predicted frequencies and known mutation rates, we find that CpG-creating synonymous mutations are 2 times more costly (selection coefficient appr. 4e-03) than non-CpG-creating synonymous mutations (selection coefficient ~2e-03 )).
 
 More detail 
 A-G mutations
 1.94
-0.0039
-0.00201
+3.9e-03
+2.01e-03
 
 C-T mutations
 1.89
-0.0037
-0.001984
+3.7e-03
+1.98e-03
 
 
 POINT 2
@@ -24,9 +24,18 @@ POINT 2
 Indeed, the estimated selection coefficients based on model predictions suggested that synonymous G to A mutations are
 2.4
 times as costly as non-CpG-forming A to G mutations (
-0.0048
+4.8e-03
 vs
-0.002
+2e-03
+).
+
+
+Indeed, the estimated selection coefficients based on model predictions suggested that synonymous C to T mutations are
+1.96
+times as costly as non-CpG-forming A to G mutations (
+3.9e-03
+vs
+2e-03
 ).
 
  Note that p-values come from analyseAndFigures-Bacheler.Rmd
@@ -41,9 +50,9 @@ In general, mutations that led to a drastic amino acid change were found at lowe
 For example, A to G mutations that result in a drastic amino acid change are roughly
 2
 times more costly than A to G mutations that do not (
-0.0057
+5.7e-03
 vs
-0.0028
+2.8e-03
 ).
 We observed similar fold changes for the other possible transitions.
 
@@ -58,9 +67,9 @@ There was also an effect of whether or not a non-synonymous mutation created a
     A-G mutations that create a CpG site are approximately
 1.36
 times more costly than those that do not 
-0.0039
+3.9e-03
 vs
-0.0028
+2.8e-03
 
 
 Similarly, 
@@ -68,9 +77,9 @@ Similarly,
             T-C mutations that create a CpG site are approximately 
 0.95
 times more costly than those that do not
-0.0039
+3.9e-03
 vs
-0.0041
+4.1e-03
 
 
 POINT 5
@@ -84,10 +93,10 @@ We estimated that, among non-synonymous mutations that do not involve a drastic 
 times more costly than A-G mutations 
 0.0157
 vs
-0.0028
+2.8e-03
 , and G-A mutations are 
 7.39
 times more costly than A-G mutations
 0.021
 vs
-0.0028
+2.8e-03
