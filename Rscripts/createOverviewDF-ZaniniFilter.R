@@ -28,8 +28,16 @@ OverviewDFZanini$TSmutrate[OverviewDFZanini$WTnt=="c"]<-mutrates$Probability[mut
 OverviewDFZanini$TSmutrate[OverviewDFZanini$WTnt=="g"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="GA"]
 OverviewDFZanini$TSmutrate[OverviewDFZanini$WTnt=="t"]<-mutrates$Probability[mutrates$Nucleotide.substitution=="UC"]
 
+OverviewDFZanini$TSmutZan<-0
+OverviewDFZanini$TSmutZan[OverviewDFZanini$WTnt=="a"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="AG"]
+OverviewDFZanini$TSmutZan[OverviewDFZanini$WTnt=="c"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="CU"]
+OverviewDFZanini$TSmutZan[OverviewDFZanini$WTnt=="g"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="GA"]
+OverviewDFZanini$TSmutZan[OverviewDFZanini$WTnt=="t"]<-mutrates$ZaniniProb[mutrates$Nucleotide.substitution=="UC"]
+
+
 for (i in 1:984){
-    OverviewDFZanini$EstSelCoeff[i] = EstimatedS(OverviewDFZanini$TSmutrate[i],OverviewDFZanini$colMeansTsZanini[i])}
+    OverviewDFZanini$EstSelCoeff[i] = EstimatedS(OverviewDFZanini$TSmutrate[i],OverviewDFZanini$colMeansTsZanini[i])
+    OverviewDFZanini$EstSelCoeffZan[i] = EstimatedS(OverviewDFZanini$TSmutZan[i],OverviewDFZanini$colMeansTsZanini[i])}
 
 #OverviewDFZanini$EstSelCoeff= OverviewDFZanini$TSmutrate/OverviewDFZanini$colMeansTsZanini
 #OverviewDFZanini$EstSelCoeff[OverviewDFZanini$EstSelCoeff>1]<-1
