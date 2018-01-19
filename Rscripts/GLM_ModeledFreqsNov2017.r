@@ -58,7 +58,7 @@ included<-c(which(mutrates$Nucleotide.substitution=="AG"),
   which(mutrates$Nucleotide.substitution=="CU"),
   which(mutrates$Nucleotide.substitution=="GA"))
 
-for (MutRates in c("Abram")){
+for (MutRates in c("Abram","Zan")){
     if (MutRates == "Abram") mus<-mutrates$Probability[included] #This reads the Abram mut rates
     if (MutRates == "Zan") mus<-mutrates$ZaniniProb[included]
 # Point 1:
@@ -72,7 +72,7 @@ NonCpGSyn<-mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTva
 magchanges<-(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,1,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))/(mus/exp(makeDataFrameToModify.withSHAPEandinRT(0,0,0, avShape, inRTval)[,rownames(modcoef)] %*% coef.vals))
 
 if (MutRates == "Abram") cat("MUTRATES FROM ABRAM 2010" ,file = "Output/GLMResultsText.txt", append=FALSE,sep="\n")
-if (MutRates == "Zan") cat("MUTRATES FROM ZANINI 2017" ,file = "Output/GLMResultsText.txt", append=TRUE,sep="\n")
+if (MutRates == "Zan") cat("/n/nMUTRATES FROM ZANINI 2017" ,file = "Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
 cat("\n\nPOINT 1\n" ,file = "Output/GLMResultsText.txt", append=TRUE,sep="\n")
 
@@ -231,7 +231,12 @@ plotVals(1, 1, 1, cols[4], .3 )
 abline(v = 1:3 + .5, col = "black")
 dev.off()
 
-png("Output/modeled_sels_AbramSEP2017.png",width=12,height=7.5,units="in",res=100)
+for (MutRates in c("Abram", "Zan")){
+    if (MutRates == "Abram") {mus<-mutrates$Probability[included] #This reads the Abram mut rates
+    png("Output/modeled_sels_AbramSEP2017.png",width=12,height=7.5,units="in",res=100)}
+    if (MutRates == "Zan") {mus<-mutrates$ZaniniProb[included]
+    png("Output/modeled_sels_Zanini2018.png",width=12,height=7.5,units="in",res=100)}
+
 #cols <- brewer.pal(4, "Set2")
 layout(matrix(1:2, nrow = 1))
 par(mar = c(4, 4.5, 1.5, 1))
@@ -255,5 +260,5 @@ plotVals.svals(1, 1, 0, cols[1], -.1 ,mus)
 plotVals.svals(1, 1, 1, cols[4], .3 ,mus)
 abline(v = 1:3 + .5, col = "black")
 dev.off()
-
+}
 
