@@ -1,6 +1,6 @@
 #Script to analyse the frequency data with conf intervals.
 #Using the Bacheler et al data
-source('./baseRscript.R')
+source('Rscripts/baseRscript.R')
 
 read.table("Output/freqPatTs_Bacheler_Threshold1.csv",sep=",",header=TRUE,row.names=1)->freqPatTs0
 read.csv("Output/OverviewSelCoeff_BachelerFilter.csv")->OverviewDF
@@ -198,9 +198,11 @@ ListOutliers<-c(ListOutliers,data$num[a])
 #dev.off()
 }
 
-OutLiers<-OverviewDF[sort(ListOutliers),c(5,5,2,10,11,12,13,14,8)]
+OutLiers<-OverviewDF[sort(ListOutliers),c(5,5,2,2,10,11,12,13,14,8)]
 
 OutLiers$EstSelCoeff<-round(OutLiers$EstSelCoeff,4)
+OutLiers$num.1[OutLiers$ProRT=="Pro"]<-OutLiers$num[OutLiers$ProRT=="Pro"]+2252
+OutLiers$num.1[OutLiers$ProRT=="RT"]<-OutLiers$num[OutLiers$ProRT=="RT"]+2252+297
 #OutLiers$EstSelCoeffZan<-round(OutLiers$EstSelCoeffZan,3)
 OutLiers$num[OutLiers$num>297]<-OutLiers$num[OutLiers$num>297]-297
 
@@ -209,11 +211,13 @@ for (i in 1:length(OutLiers[,1])){ #add Mutated nt
     OutLiers$WTnt.1[i]<-transition(as.character(OutLiers$WTnt[i]))
 }
 names(OutLiers)[2]<-"Mut"
+names(OutLiers)[4]<-"HXB2"
 
 #write.csv(OutLiers,file="Output/ListOfOutliers.csv",row.names = FALSE)
 require(xtable)
 OutLiers$num<-as.character(OutLiers$num)
 
-    print(xtable(OutLiers[OutLiers$ProRT=="Pro",]),type="Latex",file="Output/OutliersPro.html")
+print(xtable(OutLiers[OutLiers$ProRT=="Pro",]),type="Latex",file="Output/OutliersPro.txt")
 print(xtable(OutLiers[OutLiers$ProRT=="RT",]),type="Latex",file="Output/OutliersRT.txt")
 #WTnt & Mut & site & WTaa & MUTaa & dras.AA & CpG & Loc & cost
+
