@@ -19,14 +19,14 @@ DF<-data.frame(dat.file=character(),typeofsite=character(),MutRates=character(),
                effectsize=double(),pvalue=double(),stringsAsFactors=FALSE)
 n=1
 
-for(dat.file in c("Lehman", "Zanini", "Bacheler")){
+for (MutRates in c("Abram","Zan")){
+    for(dat.file in c("Bacheler","Zanini")){
     if (dat.file == "Lehman") dat = OverviewDFLehman
     if (dat.file == "Bacheler") dat = OverviewDFBacheler
     if (dat.file == "Zanini") dat = OverviewDFZanini
     
-    for (typeofsite in c("syn", "nonsyn")){
+    for (typeofsite in c("syn","nonsyn")){
             
-        for (MutRates in c("Abram","Zan")){
             if (MutRates == "Abram") selcoeffcolumn<-which(names(dat)=="EstSelCoeff")
             if (MutRates == "Zan") selcoeffcolumn<-which(names(dat)=="EstSelCoeffZan")
         
@@ -34,16 +34,17 @@ for(dat.file in c("Lehman", "Zanini", "Bacheler")){
             
             comp="a"
         
-            group1<-dat[dat$TypeOfSite==typeofsite&dat$WTnt==nuc&dat$makesCpG==0,selcoeffcolumn]
-            groupComp<-dat[dat$TypeOfSite==typeofsite&dat$WTnt==comp&dat$makesCpG==0,selcoeffcolumn]
+            group1<-dat[dat$TypeOfSite==typeofsite&dat$WTnt==nuc&dat$makesCpG==0&dat$bigAAChange==0,selcoeffcolumn]
+            groupComp<-dat[dat$TypeOfSite==typeofsite&dat$WTnt==comp&dat$makesCpG==0&dat$bigAAChange==0,selcoeffcolumn]
             
-            #print(paste("DATA:",dat.file))
-            #print(paste("mutrate:",MutRates))
-            #print(paste(nuc,typeofsite))
+            print(paste("DATA:",dat.file, "//mutrate:",MutRates))
+            print(paste(nuc,typeofsite))
             pvalue<-wilcox.test(
                 group1,groupComp,alternative = "greater", paired = FALSE)$p.value
+            print(round(pvalue,4))
             
             effectsize<-round(median(group1)/median(groupComp),3)
+            print(effectsize)
             
             DF[n,]<-list(dat.file,typeofsite,MutRates,nuc,effectsize,pvalue)
             n=n+1
@@ -54,6 +55,7 @@ for(dat.file in c("Lehman", "Zanini", "Bacheler")){
 
 pdf("EffectSizes_Datasources.pdf")
 par(mfrow=c(2,2))
+par(mar=c(5.1,4.1,4.1,2.1))
 for (MutRates in c("Abram","Zan")){
     for (typeofsite in c("syn","nonsyn")){
         plot(1,2,xlim=c(1.5,4.5),ylim=c(0.5,14),log="y",
