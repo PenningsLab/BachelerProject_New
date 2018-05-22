@@ -6,7 +6,7 @@ OverviewDFLehman <- read.table("Output/OverviewSelCoeffLehman.csv", header = TRU
 OverviewDFZanini <- read.table("Output/OverviewSelCoeffZanini.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
 
 plotter <- function(datset){
-    par(mar = c(4.5, 4.5, 0.5, 0.5))
+    par(mar = c(4.5, 4.5, 2, 2))
     if(datset == "Lehman"){
         main.dat <- OverviewDFLehman
         wheresthebreak <- 6

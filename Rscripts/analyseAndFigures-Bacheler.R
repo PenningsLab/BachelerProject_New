@@ -43,7 +43,7 @@ wilcox.test(CostnonSynNoCpGG2A,CostnonSynNoCpGA2G,alternative = "greater", paire
 
 #Make a figure with the selection coefficients across Pol
 #Currently figure 2 in the revision P Genetics Sept 2017
-if (TRUE){
+if (FALSE){
 for (MutRates in c("Abram","Zan")){
     if (MutRates == "Abram") png("Output/EstSelCoeffAbramPRO_May2018.png",width=12,height=7.5,units="in",res=100)
     if (MutRates == "Zan") png("Output/EstSelCoeffZanPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
@@ -105,15 +105,16 @@ dev.off()
 #Make a figure with single site frequency spectra for Protease AA 58
 #Currently figure 1 in the revision P Genetics Sept 2017
 if (TRUE){
-pdf("Output/SingleSiteFrequencySpectraPRO_58_Nov2017.pdf",width=8,height=4)
+pdf("Output/SingleSiteFrequencySpectraPRO_58_May2018.pdf",width=7,height=7)
+
 zerobar=50; h2=22; x1=0.25
 #cols <- c(0,brewer.pal(6, "Set2")[c(2, 1)])
-par(mfrow=c(2,3))
+layout(matrix(c(1,2,3, 4, 5, 6, 7,7,7), 3, 3, byrow = TRUE), 
+       widths=c(1,1,1), heights=c(1,1,2))
 par(mar = c(1,3,4,2))
 for (i in 172:174){
     #first create empty plot with title
     if (i == 172){
-        #par(fig=c(0,2/3,0,1))
         t=paste("nonsense mutation",sep="")
         hist(rep(0,zerobar),breaks=seq(0,1,by=0.02),xlim=c(0,.5),ylim=c(0,zerobar),yaxt="n",
              col=1,border=0,
@@ -123,6 +124,7 @@ for (i in 172:174){
         title(t,cex=1.2,line=0)
         text(x1,30,"observed data",cex=1.3)
         text(x1,h2,"(C172T)",cex=1.3)
+        mtext(text = "A", side = 3, at=-.0, cex=1.7,col=1)
     }
     if (i == 173){
         t=paste("         non-synonymous mutation",sep="")
@@ -216,6 +218,10 @@ for (i in 172:174){
     points(c(0.01,0.02),c(zerobar-10,zerobar-10),pch=15,cex=2.5,col="white")
     }else{axis(2,labels = zerobar-10,at=zerobar-10,las=1)}
 }
+
+par(mar = c(1,3,4,4))
+plotter("Bacheler") #this plotter function comes from "ranking_Ordered_Figure1.R"
+mtext(text = "B", side = 3, at=-50, cex=1.7,col=1)
 
 dev.off()
 }
