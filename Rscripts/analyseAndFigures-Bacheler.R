@@ -45,7 +45,7 @@ wilcox.test(CostnonSynNoCpGG2A,CostnonSynNoCpGA2G,alternative = "greater", paire
 #Currently figure 2 in the revision P Genetics Sept 2017
 if (TRUE){
 for (MutRates in c("Abram","Zan")){
-    if (MutRates == "Abram") png("Output/EstSelCoeffAbramPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
+    if (MutRates == "Abram") png("Output/EstSelCoeffAbramPRO_May2018.png",width=12,height=7.5,units="in",res=100)
     if (MutRates == "Zan") png("Output/EstSelCoeffZanPRO_Nov2017.png",width=12,height=7.5,units="in",res=100)
     par(mfrow=c(1,1))
     maxnuc=984
@@ -53,14 +53,14 @@ for (MutRates in c("Abram","Zan")){
     if (MutRates == "Abram") selcoeffcolumn = which(names(OverviewDF)=="EstSelCoeff")
     if (MutRates == "Zan") selcoeffcolumn = which(names(OverviewDF)=="EstSelCoeffZan")
     plot(OverviewDF$num[40:maxnuc],OverviewDF[40:maxnuc,selcoeffcolumn],
-     log="y", ylab="Estimated Selection Coefficient (cost)",cex.lab=1.3,
+     log="y", ylab="Estimated Selection Coefficient (cost)",cex.lab=1.4,
      xaxt="n",yaxt="n", xlab="",
-     col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,979))
+     col="darkgrey",t="n",pch=".", ylim=c(3.2*10^-4,1),xlim=c(40,979+10))
     axis(1,at=c(3*seq(15,95,by=20)-1,296+30),labels=c(seq(15,95,by=20),""))
     axis(1,at=3*seq(109,349,by=20)-1,labels=seq(109-99,349-99,by=20))
    #axis(2,at=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),labels=c(10^-5,10^-4,10^-3,10^-2,10^-1,10^-0),las=1,line=0,tick=FALSE)
     #eaxis(side = 2, at = 10^((-0):(-(5))),label=rep("",6))
-    eaxis(side = 2, at = 10^((-0):(-(5))))
+    eaxis(side = 2, at = 10^((-0):(-(5))), cex=2)
 
 #color Protease region grey
     rect(0, 0.00001, 297.5, 2, density = NULL, angle = 45,col="grey70",border = NA)
@@ -83,21 +83,21 @@ for (MutRates in c("Abram","Zan")){
 
 #Add "Protease" and "RT" words
 rect(0, 0.000001, 1200, 3.5*10^-4, density = NULL, angle = 45,col=1,border = NA)
-text(55*3,2.9*10^-4,"PROTEASE",col="white")
+text(55*3,2.9*10^-4,"PROTEASE",col="white", cex=1.2)
 rect(297.5, 0.000001, 1200, 3.5*10^-4, density = NULL, angle = 45,col="grey40",border = NA)
-text(220*3,2.9*10^-4,"REVERSE TRANSCRIPTASE",col="white")
+text(220*3,2.9*10^-4,"REVERSE TRANSCRIPTASE",col="white", cex=1.2)
 
 #Add legend
-legpos=296;legposV=0.4
-rect(legpos*3, 0.4*legposV, (legpos+42.5)*3, 1.7*legposV, density = NULL, angle = 45,col=alpha("white",1))
-points((legpos+5)*3,legposV/0.7,pch=21,bg=1,col=1,cex=2)
-text((legpos+9)*3,legposV/0.7,"Nonsense",adj=0)
-points((legpos+5)*3,legposV,pch=21,bg=cols[4],col=1,cex=2)
-text((legpos+9)*3,legposV,"Non-syn, C/G",adj=0)
-points((legpos+5)*3,legposV*0.7,pch=21,bg=cols[5],col=1,cex=2)
-text((legpos+9)*3,legposV*0.7,"Non-syn, A/T",adj=0)
-points((legpos+5)*3,legposV*0.49,pch=21,bg=cols[3],col=1,cex=2)
-text((legpos+9)*3,legposV*0.49,"Synonymous",adj=0)
+legpos=296;legposV=0.53
+rect(legpos*3-20, 0.42*legposV, (legpos+42.5)*3+10, 1.6*legposV, density = NULL, angle = 45,col=alpha("white",1))
+points((legpos+5)*3-20,legposV/0.7,pch=21,bg=1,col=1,cex=2)
+text((legpos+9)*3-20,legposV/0.7,"Nonsense",adj=0, cex=1.3)
+points((legpos+5)*3-20,legposV,pch=21,bg=cols[4],col=1,cex=2)
+text((legpos+9)*3-20,legposV,"Non-syn, C/G",adj=0, cex=1.3)
+points((legpos+5)*3-20,legposV*0.7,pch=21,bg=cols[5],col=1,cex=2)
+text((legpos+9)*3-20,legposV*0.7,"Non-syn, A/T",adj=0, cex=1.3)
+points((legpos+5)*3-20,legposV*0.49,pch=21,bg=cols[3],col=1,cex=2)
+text((legpos+9)*3-20,legposV*0.49,"Syn",adj=0, cex=1.3)
 
 dev.off()
 }}

@@ -21,7 +21,7 @@ MakePlot<-function(dat.file, mutrate = "Abrams", groupARows, groupBRows, nameA, 
   #if (dat.file == "Zanini") dat = OverviewDFZanini
   if (mutrate =="Abrams") selcoeffcolumn = which(names(dat)=="EstSelCoeff")
   if (mutrate =="Zanini") selcoeffcolumn = which(names(dat)=="EstSelCoeffZan")
-  par(mfrow=c(1,1))
+#  par(mfrow=c(1,1))
   maxnuc=984; q=10;
   par(mar = c(3,5,1,2))
   plot(dat$num[40:maxnuc],dat[40:maxnuc,selcoeffcolumn],
@@ -74,17 +74,19 @@ MakePlot<-function(dat.file, mutrate = "Abrams", groupARows, groupBRows, nameA, 
 
 #Check CpG effect 
 #pdf ("CpG_Effect.pdf")
-for (mutrate in c("Abrams","Zanini")){
+par(mfrow=c(2,2))
+#for (mutrate in c("Abrams","Zanini")){
   for (dat.file in c("Bacheler","Zanini")){
     if (dat.file == "Bacheler") dat = OverviewDFBacheler
     if (dat.file == "Zanini") dat = OverviewDFZanini
-    groupARows<-which(dat$TypeOfSite=="syn"&dat$WTnt%in%c("a","t")&dat$makesCpG==0)
-    groupBRows<-which(dat$TypeOfSite=="syn"&dat$WTnt%in%c("a","t")&dat$makesCpG==1)
+    groupARows<-which(dat$TypeOfSite=="syn"&dat$WTnt%in%c("t")&dat$makesCpG==0)
+    groupBRows<-which(dat$TypeOfSite=="syn"&dat$WTnt%in%c("t")&dat$makesCpG==1)
     nameA = "noCpG, syn, a/t"
     nameB = "CpG, syn, a/t"
     MakePlot(dat.file, mutrate,groupARows,groupBRows, nameA, nameB)
+    text(300,0.0001,"t only")
   }
-}
+#}
 #dev.off()
 
 #Check GA vs AG effect in syn sites
